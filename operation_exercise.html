@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>កម្មវិធីបង្កើតប័ណ្ណលំហាត់ (Worksheet Generator) - លំហាត់ប្រមាណវិធី</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- html2canvas for PNG Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Google Fonts for Khmer -->
+    <link href="https://fonts.googleapis.com/css2?family=Battambang:wght@400;700&family=Chenla&family=Hanuman:wght@400;700&family=Moul&family=Suwannaphum:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Dynamic CSS Variables controlled by JavaScript */
+            --font-family: 'Hanuman', 'Khmer OS Siemreap', sans-serif;
+            --title-size: 30px;
+            --inst-size: 18px;
+            --content-size: 30px;
+            
+            /* Watermark Variables */
+            --wm-size: 120px;
+            --wm-opacity: 0.1;
+            --wm-x: 50%;
+            --wm-y: 50%;
+            --wm-rotate: 360deg; /* Updated to 360deg */
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: #e5e7eb; /* Tailwind gray-200 */
+        }
+        
+        .print-area {
+            font-family: var(--font-family);
+        }
+
+        #preview-title { font-size: var(--title-size); }
+        .instruction-text { font-size: var(--inst-size); }
+        
+        /* Math dynamic size */
+        .math-content { font-size: var(--content-size); }
+        /* Khmer lines dynamic size */
+        .khmer-content { font-size: var(--content-size); }
+
+        @media print {
+            body { background-color: white; }
+            .no-print { display: none !important; }
+            .print-area { 
+                box-shadow: none !important; 
+                width: 100% !important; 
+                margin: 0 !important; 
+                padding: 0 !important; 
+                min-height: auto !important;
+            }
+            @page { margin: 1cm; size: A4 portrait; }
+            ::-webkit-scrollbar { display: none; }
+        }
+        
+        /* Base properties for Khmer lines */
+        .khmer-line-base {
+            line-height: 48px;
+            padding-bottom: 8px;
+            min-height: 48px;
+        }
+
+        /* The 3 different grid styles */
+        .khmer-style-lines {
+            background-image: linear-gradient(transparent 95%, #cbd5e1 95%);
+            background-size: 100% 48px;
+        }
+        
+        .khmer-style-grid {
+            background-image: linear-gradient(transparent 95%, #cbd5e1 95%), linear-gradient(90deg, transparent 95%, #cbd5e1 95%);
+            background-size: 48px 48px; /* Square grid */
+        }
+
+        .khmer-style-none {
+            background-image: none;
+        }
+
+        .sidebar-scroll::-webkit-scrollbar { width: 6px; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+
+        /* Watermark Styles */
+        #watermark-layer {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+        
+        #watermark-element {
+            position: absolute;
+            left: var(--wm-x);
+            top: var(--wm-y);
+            transform: translate(-50%, -50%) rotate(var(--wm-rotate)); /* Updated to use variable */
+            font-size: var(--wm-size); /* For text */
+            opacity: var(--wm-opacity);
+            color: #000;
+            font-weight: bold;
+            white-space: nowrap;
+            user-select: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Specific style for image watermark to scale correctly */
+        .watermark-image {
+            width: var(--wm-size);
+            height: auto;
+            max-width: none;
+        }
+
+        /* Elevate content above watermark */
+        .content-layer {
+            position: relative;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <!-- SIDEBAR CONTROLS (Hidden on Print) -->
+    <div class="w-80 bg-white shadow-xl flex flex-col no-print border-r border-gray-300 z-20 h-full">
+        <!-- Top Navigation Bar -->
+        <div class="p-3 bg-blue-700 text-white flex items-center justify-between gap-2 shrink-0 border-b border-blue-800">
+            <a href="index.html" class="flex items-center gap-1.5 text-xs font-semibold hover:bg-blue-800 px-2.5 py-1.5 rounded transition border border-blue-500/50" title="ត្រឡប់ទៅកាតលំហាត់ដើម">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                កាតលំហាត់
+            </a>
+            <a href="../../index.html" class="flex items-center gap-1 text-xs font-semibold hover:bg-blue-800 px-2 py-1.5 rounded transition border border-blue-500/50" title="ត្រឡប់ទៅទំព័រដើម">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                ទំព័រដើម
+            </a>
+        </div>
+
+        <div class="p-3.5 bg-blue-600 text-white font-bold text-base text-center flex items-center justify-center gap-2 shrink-0 shadow-sm">
+            <svg class="w-5 h-5 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            <span>លំហាត់ប្រមាណវិធី</span>
+        </div>
+        
+        <div class="p-4 flex-1 flex flex-col gap-5 overflow-y-auto sidebar-scroll text-sm">
+            
+            <!-- Typography & Styling Settings -->
+            <div class="space-y-3 shrink-0 bg-gray-50 p-3 rounded border border-gray-200">
+                <h3 class="font-bold text-gray-700 border-b pb-1">រចនាប័ទ្ម (Typography)</h3>
+                <div>
+                    <label class="block text-xs text-gray-600 mb-1">ពុម្ពអក្សរ (Font Family)</label>
+                    <select id="font-family-select" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-xs">
+                        <option value="'Hanuman', sans-serif">Hanuman (ហនុមាន)</option>
+                        <option value="'Battambang', sans-serif">Battambang (បាត់ដំបង)</option>
+                        <option value="'Moul', serif">Moul (មូល)</option>
+                        <option value="'Suwannaphum', serif">Suwannaphum (សុវណ្ណភូមិ)</option>
+                        <option value="'Chenla', sans-serif">Chenla (ចេនឡា)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-600 mb-1">ទំហំចំណងជើង: <span id="val-title-size">30</span>px</label>
+                    <input type="range" min="16" max="48" value="30" oninput="updateStyle('--title-size', this.value, 'px'); document.getElementById('val-title-size').innerText=this.value;" class="w-full">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-600 mb-1">ទំហំការណែនាំ: <span id="val-inst-size">18</span>px</label>
+                    <input type="range" min="12" max="32" value="18" oninput="updateStyle('--inst-size', this.value, 'px'); document.getElementById('val-inst-size').innerText=this.value;" class="w-full">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-600 mb-1">ទំហំលំហាត់ (អក្សរ/លេខ): <span id="val-content-size">30</span>px</label>
+                    <input type="range" min="16" max="64" value="30" oninput="updateStyle('--content-size', this.value, 'px'); document.getElementById('val-content-size').innerText=this.value;" class="w-full">
+                </div>
+            </div>
+
+            <!-- General Settings -->
+            <div class="space-y-3 shrink-0">
+                <h3 class="font-bold text-gray-700 border-b pb-1">ការកំណត់ទូទៅ</h3>
+                <div>
+                    <label class="block text-xs text-gray-600 mb-1">ចំណងជើងប័ណ្ណ</label>
+                    <input type="text" id="input-title" value="ប័ណ្ណលំហាត់អនុវត្តន៍" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-xs" />
+                </div>
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs text-gray-600">សេចក្តីណែនាំ</label>
+                        <label class="flex items-center gap-1 text-xs cursor-pointer">
+                            <input type="checkbox" id="toggle-instruction" checked onchange="toggleInstructionVisibility()"> បង្ហាញ
+                        </label>
+                    </div>
+                    <textarea id="input-instruction" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-xs" rows="2">ចូរគណនាលេខខាងក្រោមឱ្យបានត្រឹមត្រូវ៖</textarea>
+                </div>
+            </div>
+
+            <!-- Watermark Settings with Image Upload -->
+            <div class="space-y-3 shrink-0 bg-gray-50 p-3 rounded border border-gray-200">
+                <h3 class="font-bold text-gray-700 border-b pb-1">សញ្ញាសម្គាល់ (Watermark)</h3>
+                
+                <div class="flex gap-2 mb-2">
+                    <label class="flex items-center gap-1 text-xs cursor-pointer">
+                        <input type="radio" name="wm_type" value="text" checked onchange="updateWatermarkMode(this.value)"> អក្សរ (Text)
+                    </label>
+                    <label class="flex items-center gap-1 text-xs cursor-pointer">
+                        <input type="radio" name="wm_type" value="image" onchange="updateWatermarkMode(this.value)"> រូបភាព (Logo)
+                    </label>
+                </div>
+
+                <div id="wm-text-container">
+                    <label class="block text-xs text-gray-600 mb-1">អត្ថបទ (Text)</label>
+                    <input type="text" id="wm-text" placeholder="វាយអត្ថបទទីនេះ..." oninput="updateWatermarkContent()" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-xs" />
+                </div>
+
+                <div id="wm-image-container" class="hidden">
+                    <label class="block text-xs text-gray-600 mb-1">ជ្រើសរើស Logo</label>
+                    <input type="file" id="wm-file" accept="image/*" class="w-full text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 mt-2">
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1">ទំហំ</label>
+                        <!-- Increased max to 800 to accommodate large image logos -->
+                        <input type="range" min="20" max="800" value="120" oninput="updateStyle('--wm-size', this.value, 'px')" class="w-full">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1">ភាពច្បាស់ (Opacity)</label>
+                        <input type="range" min="1" max="100" value="10" oninput="updateStyle('--wm-opacity', this.value / 100)" class="w-full">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1">ទីតាំង ឆ្វេង-ស្តាំ (X)</label>
+                        <input type="range" min="0" max="100" value="50" oninput="updateStyle('--wm-x', this.value, '%')" class="w-full">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1">ទីតាំង លើ-ក្រោម (Y)</label>
+                        <input type="range" min="0" max="100" value="50" oninput="updateStyle('--wm-y', this.value, '%')" class="w-full">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1">បង្វិល (Rotation)</label>
+                        <input type="range" min="-360" max="360" value="360" oninput="updateStyle('--wm-rotate', this.value, 'deg')" class="w-full">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Frame Settings -->
+            <div class="space-y-3 shrink-0 bg-gray-50 p-3 rounded border border-gray-200">
+                <h3 class="font-bold text-gray-700 border-b pb-1">ស៊ុម (Frame)</h3>
+                <div>
+                    <label class="block text-xs text-gray-600 mb-1">ជ្រើសរើសរូបភាពស៊ុម (PNG/JPG)</label>
+                    <input type="file" id="frame-file" accept="image/png, image/jpeg" class="w-full text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+                </div>
+                <button onclick="removeFrame()" class="text-xs text-red-500 hover:text-red-700 hidden" id="btn-remove-frame">លុបស៊ុមចេញ</button>
+            </div>
+
+            <!-- Subject Selector -->
+            <div class="space-y-3 shrink-0">
+                <h3 class="font-bold text-gray-700 border-b pb-1">មុខវិជ្ជា</h3>
+                <div class="flex gap-2">
+                    <button id="btn-math" class="flex-1 py-2 rounded border bg-blue-50 border-blue-500 text-blue-700 font-bold text-xs" onclick="setSubject('math')">គណិតវិទ្យា</button>
+                    <button id="btn-khmer" class="flex-1 py-2 rounded border bg-gray-50 border-gray-300 text-gray-600 text-xs" onclick="setSubject('khmer')">ភាសាខ្មែរ</button>
+                </div>
+            </div>
+
+            <!-- Math Specific Settings -->
+            <div id="math-controls" class="space-y-3 bg-gray-50 p-3 rounded border border-gray-200 shrink-0">
+                <h3 class="font-bold text-gray-700 text-sm">ជម្រើសគណិតវិទ្យា</h3>
+                <div class="flex gap-2">
+                    <div class="flex-1">
+                        <label class="block text-xs text-gray-600 mb-1">ប្រមាណវិធី</label>
+                        <select id="input-operation" class="w-full p-2 border border-gray-300 rounded bg-white focus:outline-none focus:border-blue-500 text-xs">
+                            <option value="+">បូក (+)</option>
+                            <option value="-">ដក (-)</option>
+                            <option value="x">គុណ (x)</option>
+                            <option value="÷">ចែក (÷)</option>
+                        </select>
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-xs text-gray-600 mb-1">ប្រភេទលេខ</label>
+                        <select id="input-number-type" class="w-full p-2 border border-gray-300 rounded bg-white focus:outline-none focus:border-blue-500 text-xs">
+                            <option value="arabic">លេខអារ៉ាប់ (1, 2, 3)</option>
+                            <option value="khmer">លេខខ្មែរ (១, ២, ៣)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <div class="flex-1">
+                        <label class="block text-xs text-gray-600 mb-1">ខ្ទង់តួទី១</label>
+                        <input type="number" id="input-digit1" value="2" min="1" max="10" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-xs" />
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-xs text-gray-600 mb-1">ខ្ទង់តួទី២</label>
+                        <input type="number" id="input-digit2" value="2" min="1" max="10" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-xs" />
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <div class="flex-1">
+                        <label class="block text-xs text-gray-600 mb-1">លេខទសភាគ</label>
+                        <select id="input-decimal" class="w-full p-2 border border-gray-300 rounded bg-white focus:outline-none focus:border-blue-500 text-xs">
+                            <option value="0">គ្មាន</option>
+                            <option value="1">១ ខ្ទង់ (0.0)</option>
+                            <option value="2">២ ខ្ទង់ (0.00)</option>
+                            <option value="3">៣ ខ្ទង់ (0.000)</option>
+                        </select>
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-xs text-gray-600 mb-1">ចំនួនលំហាត់</label>
+                        <input type="number" id="input-question-count" value="20" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-xs" />
+                    </div>
+                </div>
+                <button onclick="generateMath()" class="w-full mt-2 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition duration-200 text-sm">
+                    បង្កើតលំហាត់ថ្មី
+                </button>
+            </div>
+
+            <!-- Khmer Specific Settings with Grid Options -->
+            <div id="khmer-controls" class="space-y-3 bg-gray-50 p-3 rounded border border-gray-200 hidden shrink-0">
+                <div class="flex justify-between items-center">
+                    <h3 class="font-bold text-gray-700 text-sm">គ្រប់គ្រងបន្ទាត់</h3>
+                    <select id="khmer-grid-style" onchange="renderKhmerPreview()" class="p-1 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-xs">
+                        <option value="khmer-style-lines">បន្ទាត់ (Lines)</option>
+                        <option value="khmer-style-grid">ក្រឡា (Grid)</option>
+                        <option value="khmer-style-none">គ្មាន (None)</option>
+                    </select>
+                </div>
+                <div id="khmer-lines-editor" class="space-y-2 max-h-48 overflow-y-auto pr-1 sidebar-scroll">
+                    <!-- Dynamic Khmer lines will be injected here -->
+                </div>
+                <div class="flex gap-2 pt-2 border-t">
+                    <button onclick="addKhmerLine('text')" class="flex-1 bg-white border border-gray-300 text-gray-700 py-1 rounded text-xs hover:bg-gray-100">+ អត្ថបទ</button>
+                    <button onclick="addKhmerLine('practice')" class="flex-1 bg-white border border-gray-300 text-gray-700 py-1 rounded text-xs hover:bg-gray-100">+ ពាក្យ/ល្បះ</button>
+                    <button onclick="addKhmerLine('blank')" class="flex-1 bg-white border border-gray-300 text-gray-700 py-1 rounded text-xs hover:bg-gray-100">+ បន្ទាត់</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Controls -->
+        <div class="p-4 border-t border-gray-300 bg-gray-50 shrink-0 space-y-2 text-sm">
+            <button onclick="downloadPNG()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded flex items-center justify-center gap-2 shadow transition duration-200">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                ទាញយកជា PNG
+            </button>
+            <button onclick="window.print()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center justify-center gap-2 shadow transition duration-200">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                បោះពុម្ព (Print)
+            </button>
+        </div>
+    </div>
+
+    <!-- WORKSHEET PREVIEW AREA -->
+    <div class="flex-1 overflow-y-auto p-4 md:p-8 flex justify-center h-full">
+        <div id="capture-area" class="print-area bg-white w-[210mm] min-h-[297mm] p-[20mm] shadow-2xl relative text-gray-900 mx-auto overflow-hidden" style="background-size: 100% 100%; background-position: center; background-repeat: no-repeat;">
+            
+            <!-- WATERMARK LAYER -->
+            <div id="watermark-layer">
+                <div id="watermark-element"></div>
+            </div>
+
+            <!-- CONTENT LAYER -->
+            <div class="content-layer">
+                <!-- Worksheet Header -->
+                <div class="text-center mb-6 border-b-2 border-gray-800 pb-4">
+                    <h1 id="preview-title" class="font-bold mb-4">ប័ណ្ណលំហាត់អនុវត្តន៍</h1>
+                    <div class="flex justify-between items-end text-lg mt-6">
+                        <div class="flex items-end flex-1 mr-4">
+                            <span class="mr-2 font-bold whitespace-nowrap">ឈ្មោះសិស្ស៖</span>
+                            <div class="border-b border-dotted border-gray-500 flex-1 h-6"></div>
+                        </div>
+                        <div class="flex items-end w-32 mr-4">
+                            <span class="mr-2 font-bold">ថ្នាក់ទី៖</span>
+                            <div class="border-b border-dotted border-gray-500 flex-1 h-6"></div>
+                        </div>
+                        <div class="flex items-end w-48">
+                            <span class="mr-2 font-bold">កាលបរិច្ឆេទ៖</span>
+                            <div class="border-b border-dotted border-gray-500 flex-1 h-6"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="preview-instruction-container" class="mb-6 flex instruction-text">
+                    <span class="font-bold mr-2 whitespace-nowrap">ការណែនាំ៖</span>
+                    <span id="preview-instruction" class="underline underline-offset-4 decoration-dotted decoration-gray-400 w-full">ចូរគណនាលេខខាងក្រោមឱ្យបានត្រឹមត្រូវ៖</span>
+                </div>
+
+                <!-- Content Area -->
+                <div class="min-h-[160mm]">
+                    
+                    <!-- Math Grid Layout -->
+                    <div id="preview-math" class="grid grid-cols-4 gap-x-8 gap-y-10 mt-10 math-content">
+                        <!-- Math questions will be injected here -->
+                    </div>
+
+                    <!-- Khmer Lined Layout (Hidden by default) -->
+                    <div id="preview-khmer" class="mt-4 hidden khmer-content flex flex-col gap-2">
+                        <!-- Khmer lines will be injected here -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- State Management ---
+        let currentSubject = 'math';
+        let mathQuestions = [];
+        let watermarkType = 'text'; // 'text' or 'image'
+        let watermarkImgSrc = '';
+
+        let khmerLines = [
+            { id: 1, type: 'text', content: 'ចូរអាន និងសរសេរល្បះខាងក្រោមឡើងវិញ៖' },
+            { id: 2, type: 'practice', content: 'កុមារទៅសាលារៀនរាល់ថ្ងៃ' },
+            { id: 3, type: 'blank', content: '' },
+            { id: 4, type: 'practice', content: 'ខ្ញុំចូលចិត្តរៀនភាសាខ្មែរ' },
+            { id: 5, type: 'blank', content: '' },
+            { id: 6, type: 'blank', content: '' },
+        ];
+
+        // --- Core Utility Functions ---
+        
+        // CSS Variable updater for dynamic styling
+        function updateStyle(variable, value, unit = '') {
+            document.documentElement.style.setProperty(variable, value + unit);
+        }
+
+        // Font Family selector
+        document.getElementById('font-family-select').addEventListener('change', function(e) {
+            updateStyle('--font-family', e.target.value);
+        });
+
+        // Simple Inputs
+        document.getElementById('input-title').addEventListener('input', function(e) {
+            document.getElementById('preview-title').innerText = e.target.value;
+        });
+        document.getElementById('input-instruction').addEventListener('input', function(e) {
+            document.getElementById('preview-instruction').innerText = e.target.value;
+        });
+
+        // --- Instructions Toggle Logic ---
+        function toggleInstructionVisibility() {
+            const container = document.getElementById('preview-instruction-container');
+            if (document.getElementById('toggle-instruction').checked) {
+                container.style.display = 'flex';
+            } else {
+                container.style.display = 'none';
+            }
+        }
+
+        // --- Frame Upload Logic ---
+        document.getElementById('frame-file').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    document.getElementById('capture-area').style.backgroundImage = `url(${event.target.result})`;
+                    document.getElementById('btn-remove-frame').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function removeFrame() {
+            document.getElementById('capture-area').style.backgroundImage = 'none';
+            document.getElementById('frame-file').value = '';
+            document.getElementById('btn-remove-frame').classList.add('hidden');
+        }
+
+        // --- Watermark Logic ---
+        function updateWatermarkMode(mode) {
+            watermarkType = mode;
+            if (mode === 'text') {
+                document.getElementById('wm-text-container').classList.remove('hidden');
+                document.getElementById('wm-image-container').classList.add('hidden');
+            } else {
+                document.getElementById('wm-text-container').classList.add('hidden');
+                document.getElementById('wm-image-container').classList.remove('hidden');
+            }
+            updateWatermarkContent();
+        }
+
+        function updateWatermarkContent() {
+            const el = document.getElementById('watermark-element');
+            if (watermarkType === 'text') {
+                el.innerText = document.getElementById('wm-text').value;
+            } else {
+                if (watermarkImgSrc) {
+                    el.innerHTML = `<img src="${watermarkImgSrc}" class="watermark-image">`;
+                } else {
+                    el.innerHTML = '';
+                }
+            }
+        }
+
+        // Handle Image Upload for Watermark
+        document.getElementById('wm-file').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    watermarkImgSrc = event.target.result;
+                    updateWatermarkContent();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // --- Subject Toggle Logic ---
+        function setSubject(subject) {
+            currentSubject = subject;
+            
+            const btnMath = document.getElementById('btn-math');
+            const btnKhmer = document.getElementById('btn-khmer');
+            const mathControls = document.getElementById('math-controls');
+            const khmerControls = document.getElementById('khmer-controls');
+            const previewMath = document.getElementById('preview-math');
+            const previewKhmer = document.getElementById('preview-khmer');
+            const inputInstruction = document.getElementById('input-instruction');
+            const previewInstruction = document.getElementById('preview-instruction');
+
+            if (subject === 'math') {
+                btnMath.className = "flex-1 py-2 rounded border bg-blue-50 border-blue-500 text-blue-700 font-bold text-xs";
+                btnKhmer.className = "flex-1 py-2 rounded border bg-gray-50 border-gray-300 text-gray-600 text-xs";
+                mathControls.classList.remove('hidden');
+                khmerControls.classList.add('hidden');
+                previewMath.classList.remove('hidden');
+                previewKhmer.classList.add('hidden');
+
+                inputInstruction.value = "ចូរគណនាលេខខាងក្រោមឱ្យបានត្រឹមត្រូវ៖";
+                previewInstruction.innerText = "ចូរគណនាលេខខាងក្រោមឱ្យបានត្រឹមត្រូវ៖";
+                
+                if (mathQuestions.length === 0) generateMath();
+            } else {
+                btnKhmer.className = "flex-1 py-2 rounded border bg-blue-50 border-blue-500 text-blue-700 font-bold text-xs";
+                btnMath.className = "flex-1 py-2 rounded border bg-gray-50 border-gray-300 text-gray-600 text-xs";
+                khmerControls.classList.remove('hidden');
+                mathControls.classList.add('hidden');
+                previewKhmer.classList.remove('hidden');
+                previewMath.classList.add('hidden');
+
+                inputInstruction.value = "ចូរអនុវត្តសរសេរតាមរចនាប័ទ្មខាងក្រោម៖";
+                previewInstruction.innerText = "ចូរអនុវត្តសរសេរតាមរចនាប័ទ្មខាងក្រោម៖";
+
+                renderKhmerEditor();
+                renderKhmerPreview();
+            }
+        }
+
+        // --- Math Logic ---
+        const khmerNumbers = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
+        
+        function toKhmerNum(numStr) {
+            return numStr.toString().split('').map(char => {
+                if (char >= '0' && char <= '9') {
+                    return khmerNumbers[parseInt(char)];
+                }
+                return char;
+            }).join('');
+        }
+
+        // អនុគមន៍ជំនួយដើម្បីបង្កើតលេខផ្អែកតាមចំនួនខ្ទង់
+        function getRanNum(digits) {
+            if (digits <= 0) return 0;
+            const min = digits === 1 ? 1 : Math.pow(10, digits - 1);
+            const max = Math.pow(10, digits) - 1;
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function generateMath() {
+            const operation = document.getElementById('input-operation').value;
+            const digit1 = parseInt(document.getElementById('input-digit1').value) || 1;
+            const digit2 = parseInt(document.getElementById('input-digit2').value) || 1;
+            const decimals = parseInt(document.getElementById('input-decimal').value) || 0;
+            const questionCount = parseInt(document.getElementById('input-question-count').value) || 20;
+            
+            mathQuestions = [];
+            for (let i = 0; i < questionCount; i++) {
+                let n1, n2;
+                let decFactor = Math.pow(10, decimals);
+                
+                if (operation === '+') {
+                    n1 = getRanNum(digit1);
+                    n2 = getRanNum(digit2);
+                } else if (operation === '-') {
+                    n1 = getRanNum(digit1);
+                    n2 = getRanNum(digit2);
+                    if (n1 < n2) { let temp = n1; n1 = n2; n2 = temp; }
+                } else if (operation === 'x') {
+                    n1 = getRanNum(digit1);
+                    n2 = getRanNum(digit2);
+                } else if (operation === '÷') {
+                    n2 = getRanNum(digit2);
+                    let quotient = getRanNum(digit1);
+                    n1 = n2 * quotient; 
+                }
+                
+                // បម្លែងទៅជាទសភាគដោយរក្សាចំនួនខ្ទង់ដែលបានកំណត់
+                let strNum1 = (n1 / decFactor).toFixed(decimals);
+                let strNum2 = (n2 / decFactor).toFixed(decimals);
+
+                mathQuestions.push({ id: i, num1: strNum1, num2: strNum2, operation });
+            }
+            renderMathPreview();
+        }
+
+        function renderMathPreview() {
+            const container = document.getElementById('preview-math');
+            container.innerHTML = '';
+            
+            const numberType = document.getElementById('input-number-type').value;
+
+            // កំណត់ចំនួនជួរឈរ និងការដកឃ្លាទៅតាមប្រភេទប្រមាណវិធី
+            if (mathQuestions.length > 0 && mathQuestions[0].operation === '÷') {
+                container.className = "grid grid-cols-3 gap-x-24 gap-y-16 mt-10 math-content";
+            } else {
+                container.className = "grid grid-cols-4 gap-x-8 gap-y-10 mt-10 math-content";
+            }
+
+            mathQuestions.forEach(q => {
+                const qDiv = document.createElement('div');
+                qDiv.className = "flex justify-center mb-6";
+                
+                const displayNum1 = numberType === 'khmer' ? toKhmerNum(q.num1) : q.num1;
+                const displayNum2 = numberType === 'khmer' ? toKhmerNum(q.num2) : q.num2;
+
+                if (q.operation === '÷') {
+                    // Division layout (Long division style)
+                    qDiv.innerHTML = `
+                        <div class="flex font-bold" style="font-size: inherit;">
+                            <div class="pr-6 tracking-widest flex items-start pt-1">${displayNum1}</div>
+                            <div class="border-l-[2px] border-black flex flex-col min-h-[5em]">
+                                <div class="border-b-[2px] border-black px-4 pb-1 tracking-widest text-center min-w-[3em]">${displayNum2}</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // Addition, Subtraction, Multiplication layout
+                    qDiv.innerHTML = `
+                        <div class="inline-grid grid-cols-[auto_auto] gap-x-3 font-bold items-center" style="font-size: inherit;">
+                            <div></div> 
+                            <div class="text-right tracking-widest">${displayNum1}</div>
+                            <div class="flex items-center h-full justify-center -translate-y-3" style="font-size: 0.8em;">${q.operation}</div>
+                            <div class="text-right tracking-widest">${displayNum2}</div>
+                            <div class="col-span-2 border-t-[0.1em] border-black mt-[0.1em]"></div>
+                        </div>
+                    `;
+                }
+                container.appendChild(qDiv);
+            });
+        }
+
+        // --- Khmer Logic ---
+        function addKhmerLine(type) {
+            const newId = khmerLines.length > 0 ? Math.max(...khmerLines.map(l => l.id)) + 1 : 1;
+            let content = type === 'practice' ? 'ពាក្យថ្មី' : '';
+            khmerLines.push({ id: newId, type: type, content: content });
+            
+            renderKhmerEditor();
+            renderKhmerPreview();
+            
+            const editor = document.getElementById('khmer-lines-editor');
+            editor.scrollTop = editor.scrollHeight;
+        }
+
+        window.updateKhmerLine = function(id, newContent) {
+            const index = khmerLines.findIndex(l => l.id === id);
+            if (index !== -1) {
+                khmerLines[index].content = newContent;
+                renderKhmerPreview();
+            }
+        }
+
+        window.deleteKhmerLine = function(id) {
+            khmerLines = khmerLines.filter(l => l.id !== id);
+            renderKhmerEditor();
+            renderKhmerPreview();
+        }
+
+        function renderKhmerEditor() {
+            const editor = document.getElementById('khmer-lines-editor');
+            editor.innerHTML = '';
+            
+            khmerLines.forEach((line, index) => {
+                const div = document.createElement('div');
+                div.className = "flex gap-2 items-center bg-white p-2 border rounded";
+                
+                let inputHtml = '';
+                if (line.type !== 'blank') {
+                    const placeholder = line.type === 'practice' ? 'ពាក្យ ឬ ល្បះ...' : 'អត្ថបទ...';
+                    inputHtml = `<input type="text" value="${line.content}" oninput="updateKhmerLine(${line.id}, this.value)" class="flex-1 text-sm border-b focus:outline-none focus:border-blue-500 px-1" placeholder="${placeholder}" />`;
+                } else {
+                    inputHtml = `<span class="flex-1 text-sm text-gray-400 italic px-1">-- បន្ទាត់ទទេ --</span>`;
+                }
+
+                div.innerHTML = `
+                    <span class="text-xs font-bold text-gray-400 w-4">${index + 1}.</span>
+                    ${inputHtml}
+                    <button onclick="deleteKhmerLine(${line.id})" class="text-red-500 hover:text-red-700 p-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                `;
+                editor.appendChild(div);
+            });
+        }
+
+        function renderKhmerPreview() {
+            const container = document.getElementById('preview-khmer');
+            container.innerHTML = '';
+            
+            // Get selected grid style from UI
+            const gridStyleClass = document.getElementById('khmer-grid-style').value;
+            
+            khmerLines.forEach(line => {
+                const div = document.createElement('div');
+                
+                if (line.type === 'text') {
+                    div.className = "font-bold mt-4 mb-1";
+                    div.style.fontSize = "calc(var(--content-size) * 0.7)"; 
+                    div.innerText = line.content;
+                } else if (line.type === 'practice') {
+                    // Applied dynamic grid style here
+                    div.className = `khmer-line-base ${gridStyleClass} w-full flex px-2`;
+                    
+                    // Removed 'tracking-[1.5em]' and the repetition to allow writing whole words/sentences as requested
+                    div.innerHTML = `
+                        <span class="font-bold border-r-[2px] border-gray-400 pr-4 mr-4 text-blue-900">${line.content}</span>
+                        <span class="text-gray-300 opacity-50 flex-1 whitespace-nowrap">
+                            ${line.content}
+                        </span>
+                    `;
+                } else { // blank
+                    div.className = `khmer-line-base ${gridStyleClass} w-full px-2`;
+                    div.innerHTML = "&nbsp;";
+                }
+                
+                container.appendChild(div);
+            });
+        }
+
+        // --- Export to PNG Logic ---
+        function downloadPNG() {
+            const captureArea = document.getElementById('capture-area');
+            
+            html2canvas(captureArea, {
+                scale: 2, 
+                useCORS: true, 
+                backgroundColor: "#ffffff",
+                logging: false
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'ប័ណ្ណលំហាត់.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }).catch(err => {
+                console.error("Error generating image: ", err);
+            });
+        }
+
+        // --- Initialization ---
+        window.onload = function() {
+            generateMath(); 
+            updateWatermarkContent(); // Initialize watermark
+        };
+
+    </script>
+</body>
+</html>

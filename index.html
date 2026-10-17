@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>កងបង្វិលចាប់ពាក្យ - Word Spinner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="shortcut icon" href="../../icon/icon.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container" style="max-width: 800px;">
+        <header class="app-header">
+            <a href="../../index.html" class="btn-back">⬅️ ត្រលប់ក្រោយ (Back)</a>
+            <h1 style="color: #eab308;">កងបង្វិលចាប់ពាក្យ 🎡</h1>
+            <p>បង្វិលកងដើម្បីជ្រើសរើសពាក្យដោយចៃដន្យ</p>
+        </header>
+
+        <main class="spinner-area">
+            <div class="input-section">
+                <h3>បញ្ជូលពាក្យ (១ពាក្យក្នុង១បន្ទាត់)</h3>
+                <textarea id="items-input" rows="8">សៀវភៅ
+ប៊ិច
+ខ្មៅដៃ
+បន្ទាត់
+ជ័រលុប
+កាតាប
+តុ
+កៅអី</textarea>
+                <button id="btn-update" class="btn-secondary">ធ្វើបច្ចុប្បន្នភាពកង (Update Wheel)</button>
+            </div>
+            
+            <div class="wheel-section">
+                <div class="wheel-container">
+                    <canvas id="wheel-canvas" width="400" height="400"></canvas>
+                    <div class="pointer">▼</div>
+                </div>
+                <button id="btn-spin" class="btn-large" style="background: #eab308; margin-top: 20px;">បង្វិល (Spin!)</button>
+            </div>
+        </main>
+
+        <!-- Result Modal -->
+        <div id="result-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>ទទួលបាន៖</h2>
+                <h1 id="result-text" style="color: #eab308; font-size: 3rem; margin: 20px 0;">?</h1>
+                <button id="btn-close-modal" class="btn-large">បិទ (Close)</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
