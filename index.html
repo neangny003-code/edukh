@@ -1,56 +1,3210 @@
 <!DOCTYPE html>
 <html lang="km">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>កងបង្វិលចាប់ពាក្យ - Word Spinner</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="shortcut icon" href="../../icon/icon.png" type="image/png">
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CK Education — ល្បែងសិក្សាសម្រាប់កុមារកម្ពុជា</title>
+  <link rel="shortcut icon" href="icon/icon.png" type="image/png">
+  <link rel="stylesheet" href="assets/theme.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Battambang:wght@400;600;700&family=Moul&family=Kantumruy+Pro:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <style>
+    :root {
+      --sidebar-width: 250px;
+      --primary-blue: #1e40af;
+      --primary-gradient: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+      --bg-dashboard: #f1f5f9;
+      --card-bg: #ffffff;
+      --card-border: rgba(226, 232, 240, 0.8);
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Kantumruy Pro', 'Battambang', sans-serif;
+      background-color: var(--bg-dashboard);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background-color 0.3s ease;
+    }
+
+    .font-moul {
+      font-family: 'Moul', cursive;
+    }
+
+    /* Font Weight Customization (Bold vs Regular) */
+    body.font-regular {
+      font-weight: 400 !important;
+    }
+
+    body.font-regular h1,
+    body.font-regular h2,
+    body.font-regular h3,
+    body.font-regular h4,
+    body.font-regular span,
+    body.font-regular p,
+    body.font-regular div,
+    body.font-regular button,
+    body.font-regular a,
+    body.font-regular input {
+      font-weight: 400;
+    }
+
+    body.font-regular .font-bold {
+      font-weight: 500 !important;
+    }
+
+    body.font-regular .font-moul {
+      font-family: 'Moul', cursive !important;
+    }
+
+    /* App Layout Container */
+    .app-layout {
+      display: flex;
+      min-height: 100vh;
+      width: 100%;
+      position: relative;
+    }
+
+    /* Sidebar Styling (Supports In/Out Collapse) */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: #ffffff;
+      border-right: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 1000;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s ease;
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.03);
+    }
+
+    /* Collapsed Sidebar Mode */
+    body.sidebar-collapsed .sidebar {
+      transform: translateX(-100%);
+    }
+
+    body.sidebar-collapsed .main-content {
+      margin-left: 0;
+    }
+
+    .sidebar-brand {
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .brand-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      object-fit: contain;
+      filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.1));
+    }
+
+    .brand-info h2 {
+      font-family: 'Moul', cursive;
+      font-size: 0.9rem;
+      color: #1e3a8a;
+      line-height: 1.2;
+    }
+
+    .brand-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #16a34a;
+      background: #dcfce7;
+      padding: 1px 6px;
+      border-radius: 999px;
+      margin-top: 2px;
+    }
+
+    .brand-badge::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      background: #22c55e;
+      border-radius: 50%;
+      animation: pulseGreen 2s infinite;
+    }
+
+    .sidebar-toggle-close {
+      background: #f1f5f9;
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      color: #64748b;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .sidebar-toggle-close:hover {
+      background: #e2e8f0;
+      color: #1e293b;
+    }
+
+    .sidebar-menu {
+      flex: 1;
+      padding: 10px 10px;
+      overflow-y: auto;
+    }
+
+    .menu-section-title {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #94a3b8;
+      padding: 8px 10px 4px;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: #475569;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      margin-bottom: 2px;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+
+    .menu-item i {
+      font-size: 1rem;
+      width: 20px;
+      text-align: center;
+    }
+
+    .menu-item:hover {
+      background: #f8fafc;
+      color: #2563eb;
+      transform: translateX(2px);
+    }
+
+    .menu-item.active {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: #ffffff;
+      box-shadow: 0 6px 12px -3px rgba(37, 99, 235, 0.4);
+    }
+
+    .menu-item.active i {
+      color: #ffffff;
+    }
+
+    .menu-count {
+      margin-left: auto;
+      font-size: 0.7rem;
+      padding: 1px 7px;
+      border-radius: 999px;
+      background: #f1f5f9;
+      color: #475569;
+      font-weight: 700;
+    }
+
+    .menu-item.active .menu-count {
+      background: rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+    }
+
+    .sidebar-footer {
+      padding: 10px 14px;
+      border-top: 1px solid #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #fafafa;
+    }
+
+    .admin-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 0.8rem;
+    }
+
+    .admin-info {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .admin-name {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #1e293b;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .admin-role {
+      font-size: 0.68rem;
+      color: #64748b;
+    }
+
+    /* Main Content Area */
+    .main-content {
+      margin-left: var(--sidebar-width);
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Top Sticky Navigation Bar */
+    .top-navbar {
+      background: #ffffff;
+      padding: 8px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      position: sticky;
+      top: 0;
+      z-index: 900;
+      border-bottom: 1px solid #e2e8f0;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      max-width: 520px;
+    }
+
+    /* Sidebar Toggle Button */
+    .sidebar-toggle-btn {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      color: #334155;
+      font-size: 1.05rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .sidebar-toggle-btn:hover {
+      background: #2563eb;
+      color: white;
+      border-color: #2563eb;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+    }
+
+    .search-box-wrapper {
+      position: relative;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      background: #f8fafc;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 0 10px 0 14px;
+      gap: 10px;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    }
+
+    .search-box-wrapper:focus-within {
+      background: #ffffff;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3.5px rgba(37, 99, 235, 0.15), 0 2px 8px rgba(37, 99, 235, 0.08);
+    }
+
+    .search-icon {
+      color: #64748b;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+      pointer-events: none;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .search-box-wrapper:focus-within .search-icon {
+      color: #2563eb;
+      transform: scale(1.1);
+    }
+
+    .search-box {
+      width: 100%;
+      flex: 1;
+      min-width: 0;
+      background: transparent !important;
+      border: none !important;
+      outline: none !important;
+      padding: 9px 0 !important;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      color: #1e293b;
+      font-family: 'Kantumruy Pro', 'Battambang', sans-serif;
+      box-shadow: none !important;
+    }
+
+    .search-box::placeholder {
+      color: #94a3b8;
+      opacity: 1;
+      font-size: 0.84rem;
+    }
+
+    .search-clear-btn {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 4px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .search-clear-btn:hover {
+      color: #ef4444;
+      transform: scale(1.18);
+    }
+
+    .search-clear-btn.visible {
+      display: flex;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      border: 1px solid #e2e8f0;
+      background: #ffffff;
+      color: #334155;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .nav-pill:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+
+    /* Setting Dropdown Styling */
+    .setting-dropdown-wrapper {
+      position: relative;
+    }
+
+    .setting-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.05rem;
+      cursor: pointer;
+      color: #334155;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      transition: all 0.25s ease;
+      padding: 0;
+    }
+
+    .setting-btn:hover,
+    .setting-btn.active {
+      background: #f1f5f9;
+      color: #2563eb;
+      border-color: #cbd5e1;
+      transform: rotate(35deg);
+    }
+
+    .setting-dropdown-menu {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: calc(100% + 8px);
+      min-width: 170px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+      padding: 6px;
+      z-index: 1100;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .setting-dropdown-menu.show {
+      display: block;
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 8px;
+      color: #334155;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .dropdown-item:hover {
+      background: #f8fafc;
+      color: #2563eb;
+      transform: translateX(3px);
+    }
+
+    .dropdown-item i {
+      font-size: 1rem;
+      width: 18px;
+      text-align: center;
+    }
+
+    /* Friendly Telegram Live Header Button */
+    .telegram-nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 13px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-decoration: none;
+      color: #ffffff !important;
+      background: linear-gradient(135deg, #2AABEE 0%, #229ED9 50%, #0088cc 100%);
+      box-shadow: 0 3px 10px rgba(34, 158, 217, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+      user-select: none;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      flex-shrink: 0;
+    }
+
+    .telegram-nav-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -120%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+      transform: skewX(-25deg);
+      animation: tgShimmer 3.5s infinite;
+    }
+
+    .telegram-nav-btn:hover {
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: 0 6px 20px rgba(34, 158, 217, 0.5), 0 0 0 2px rgba(42, 171, 238, 0.4);
+      color: #ffffff !important;
+    }
+
+    .telegram-nav-btn:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .tg-icon-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .tg-icon-box i {
+      font-size: 1.1rem;
+      color: #ffffff;
+      display: inline-block;
+      animation: tgPlaneFly 3s ease-in-out infinite;
+      transform-origin: center center;
+    }
+
+    .tg-live-dot {
+      position: absolute;
+      top: -2px;
+      right: -3px;
+      width: 7px;
+      height: 7px;
+      background-color: #22c55e;
+      border-radius: 50%;
+      border: 1.5px solid #ffffff;
+      animation: tgDotPulse 1.8s infinite;
+    }
+
+    .tg-text {
+      font-family: 'Kantumruy Pro', sans-serif;
+      letter-spacing: 0.2px;
+      line-height: 1;
+    }
+
+    /* Live Animations for Telegram */
+    @keyframes tgPlaneFly {
+
+      0%,
+      100% {
+        transform: translateY(0) rotate(0deg);
+      }
+
+      25% {
+        transform: translateY(-2px) rotate(-8deg) scale(1.08);
+      }
+
+      50% {
+        transform: translateY(0) rotate(0deg);
+      }
+
+      75% {
+        transform: translateY(1px) rotate(4deg) scale(0.96);
+      }
+    }
+
+    @keyframes tgDotPulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+        transform: scale(0.95);
+      }
+
+      70% {
+        box-shadow: 0 0 0 6px rgba(34, 197, 94, 0);
+        transform: scale(1.15);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+        transform: scale(0.95);
+      }
+    }
+
+    @keyframes tgShimmer {
+
+      0%,
+      60% {
+        left: -120%;
+      }
+
+      100% {
+        left: 220%;
+      }
+    }
+
+    /* Dark Mode Telegram */
+    body.dark-mode .telegram-nav-btn {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+      box-shadow: 0 3px 12px rgba(2, 132, 199, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+      border: 1px solid rgba(56, 189, 248, 0.4) !important;
+    }
+
+    body.dark-mode .telegram-nav-btn:hover {
+      box-shadow: 0 6px 22px rgba(56, 189, 248, 0.6), 0 0 0 2px rgba(56, 189, 248, 0.5) !important;
+    }
+
+    @media (max-width: 580px) {
+      .telegram-nav-btn .tg-text {
+        display: none;
+      }
+
+      .telegram-nav-btn {
+        padding: 6px 9px;
+      }
+    }
+
+    /* Social Navigation Buttons (Facebook, YouTube) */
+    .social-nav-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      text-decoration: none;
+      border: 1px solid #e2e8f0;
+      background: #ffffff;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      flex-shrink: 0;
+    }
+
+    .social-nav-btn.facebook-btn {
+      color: #1877f2;
+    }
+
+    .social-nav-btn.facebook-btn:hover {
+      background: #1877f2;
+      color: #ffffff !important;
+      border-color: #1877f2;
+      transform: translateY(-2px) scale(1.08);
+      box-shadow: 0 4px 12px rgba(24, 119, 242, 0.35);
+    }
+
+    .social-nav-btn.youtube-btn {
+      color: #ff0000;
+    }
+
+    .social-nav-btn.youtube-btn:hover {
+      background: #ff0000;
+      color: #ffffff !important;
+      border-color: #ff0000;
+      transform: translateY(-2px) scale(1.08);
+      box-shadow: 0 4px 12px rgba(255, 0, 0, 0.35);
+    }
+
+    .social-nav-btn:active {
+      transform: translateY(0) scale(0.96);
+    }
+
+    /* Dark Mode Social Buttons */
+    body.dark-mode .social-nav-btn {
+      background: #1e293b;
+      border-color: #334155;
+    }
+
+    body.dark-mode .social-nav-btn.facebook-btn {
+      color: #60a5fa;
+    }
+
+    body.dark-mode .social-nav-btn.facebook-btn:hover {
+      background: #1877f2;
+      color: #ffffff !important;
+      border-color: #1877f2;
+      box-shadow: 0 4px 14px rgba(24, 119, 242, 0.5);
+    }
+
+    body.dark-mode .social-nav-btn.youtube-btn {
+      color: #f87171;
+    }
+
+    body.dark-mode .social-nav-btn.youtube-btn:hover {
+      background: #ff0000;
+      color: #ffffff !important;
+      border-color: #ff0000;
+      box-shadow: 0 4px 14px rgba(255, 0, 0, 0.5);
+    }
+
+    /* Dashboard Body Container */
+    .dashboard-body {
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Dashboard View Section Wrapper */
+    .dashboard-section-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: all 0.3s ease;
+    }
+
+    /* Welcome Banner */
+    .welcome-banner {
+      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #4f46e5 100%);
+      border-radius: 14px;
+      padding: 14px 20px;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 6px 18px -4px rgba(30, 58, 138, 0.25);
+    }
+
+    .welcome-banner::before {
+      content: '';
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 70%);
+      top: -60px;
+      right: 40px;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .welcome-text h1 {
+      font-family: 'Moul', cursive;
+      font-size: 1.08rem;
+      color: #fef08a;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      margin-bottom: 3px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .welcome-text p {
+      font-size: 0.82rem;
+      opacity: 0.92;
+      line-height: 1.4;
+    }
+
+    .welcome-date-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(6px);
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      font-size: 0.78rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* Vibrant Stat Cards Grid */
+    .stat-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .stat-card {
+      border-radius: 14px;
+      padding: 12px 16px;
+      color: #ffffff;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 18px -4px rgba(0, 0, 0, 0.12);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 96px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 24px -5px rgba(0, 0, 0, 0.2);
+    }
+
+    .stat-card::after {
+      content: '';
+      position: absolute;
+      top: -30%;
+      right: -20%;
+      width: 100px;
+      height: 100px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .card-gradient-green {
+      background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+      box-shadow: 0 8px 16px -4px rgba(16, 185, 129, 0.3);
+    }
+
+    .card-gradient-blue {
+      background: linear-gradient(135deg, #2563eb 0%, #0284c7 100%);
+      box-shadow: 0 8px 16px -4px rgba(37, 99, 235, 0.3);
+    }
+
+    .card-gradient-purple {
+      background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+      box-shadow: 0 8px 16px -4px rgba(139, 92, 246, 0.3);
+    }
+
+    .card-gradient-orange {
+      background: linear-gradient(135deg, #ea580c 0%, #f59e0b 100%);
+      box-shadow: 0 8px 16px -4px rgba(234, 88, 12, 0.3);
+    }
+
+    .stat-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .stat-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      opacity: 0.95;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+
+    .stat-icon-badge {
+      width: 26px;
+      height: 26px;
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.22);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      backdrop-filter: blur(4px);
+    }
+
+    .stat-value {
+      font-family: 'Moul', cursive;
+      font-size: 1.32rem;
+      margin: 4px 0 2px 0;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    }
+
+    .stat-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.68rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      padding-top: 4px;
+      margin-top: 2px;
+    }
+
+    .stat-status {
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .stat-category {
+      opacity: 0.9;
+    }
+
+    /* Secondary Metric Strip */
+    .secondary-stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .sub-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.02);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .sub-card:hover {
+      border-color: #cbd5e1;
+      transform: translateY(-2px);
+    }
+
+    .sub-card-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sub-card-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+    }
+
+    .sub-card-title {
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: #475569;
+      line-height: 1.2;
+    }
+
+    .sub-card-num {
+      font-family: 'Moul', cursive;
+      font-size: 0.98rem;
+      color: #1e293b;
+      margin-top: 1px;
+    }
+
+    .sub-card-trend {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .trend-green {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .trend-blue {
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+
+    .trend-purple {
+      background: #f3e8ff;
+      color: #7e22ce;
+    }
+
+    .trend-amber {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    /* Analytics Grid (Top 5 Chart) */
+    .dashboard-analytics-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .panel-card {
+      background: #ffffff;
+      border-radius: 14px;
+      border: 1px solid #e2e8f0;
+      padding: 14px 18px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.02);
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 10px;
+    }
+
+    .panel-title {
+      font-family: 'Moul', cursive;
+      font-size: 0.94rem;
+      color: #1e3a8a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-subtitle {
+      font-size: 0.72rem;
+      color: #64748b;
+      font-weight: normal;
+      margin-top: 2px;
+    }
+
+    /* Column Bar Chart (ក្រាបសសរ) Styling */
+    .column-chart-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .column-chart-stage {
+      position: relative;
+      height: 195px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      padding: 34px 12px 0 38px;
+      background: linear-gradient(180deg, rgba(248, 250, 252, 0.8) 0%, rgba(241, 245, 249, 0.5) 100%);
+      border-radius: 12px;
+      border: 1px dashed #e2e8f0;
+    }
+
+    .chart-grid-line {
+      position: absolute;
+      left: 38px;
+      right: 12px;
+      height: 1px;
+      border-top: 1px dashed #e2e8f0;
+      pointer-events: none;
+    }
+
+    .chart-grid-line.line-100 {
+      top: 32px;
+    }
+
+    .chart-grid-line.line-75 {
+      top: 68px;
+    }
+
+    .chart-grid-line.line-50 {
+      top: 104px;
+    }
+
+    .chart-grid-line.line-25 {
+      top: 140px;
+    }
+
+    .chart-grid-line.line-0 {
+      bottom: 0px;
+      border-top: 1.5px solid #cbd5e1;
+    }
+
+    .chart-y-axis {
+      position: absolute;
+      left: 6px;
+      top: 24px;
+      bottom: 2px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #94a3b8;
+      pointer-events: none;
+    }
+
+    .chart-column-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      height: 100%;
+      width: 16%;
+      position: relative;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .column-bar {
+      width: 100%;
+      max-width: 48px;
+      border-radius: 10px 10px 3px 3px;
+      position: relative;
+      transition: height 1s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.25s ease, filter 0.25s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: center;
+    }
+
+    .chart-column-item:hover .column-bar {
+      transform: scaleY(1.02) scaleX(1.05);
+      filter: brightness(1.12);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+    }
+
+    .bar-rank-1 {
+      background: linear-gradient(180deg, #f59e0b 0%, #e11d48 100%);
+      box-shadow: 0 6px 14px rgba(225, 29, 72, 0.32);
+    }
+
+    .bar-rank-2 {
+      background: linear-gradient(180deg, #3b82f6 0%, #4f46e5 100%);
+      box-shadow: 0 6px 14px rgba(59, 130, 246, 0.32);
+    }
+
+    .bar-rank-3 {
+      background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+      box-shadow: 0 6px 14px rgba(16, 185, 129, 0.32);
+    }
+
+    .bar-rank-4 {
+      background: linear-gradient(180deg, #0ea5e9 0%, #0284c7 100%);
+      box-shadow: 0 6px 14px rgba(14, 165, 233, 0.32);
+    }
+
+    .bar-rank-5 {
+      background: linear-gradient(180deg, #8b5cf6 0%, #d946ef 100%);
+      box-shadow: 0 6px 14px rgba(139, 92, 246, 0.32);
+    }
+
+    /* Floating Metric Badges with Clear Numbers & Icons */
+    .column-floating-badge {
+      position: absolute;
+      top: -34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      font-family: 'Kantumruy Pro', sans-serif;
+      white-space: nowrap;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      z-index: 5;
+    }
+
+    .badge-rank-1 {
+      background: linear-gradient(135deg, #f59e0b 0%, #e11d48 100%);
+    }
+
+    .badge-rank-2 {
+      background: linear-gradient(135deg, #3b82f6 0%, #4f46e5 100%);
+    }
+
+    .badge-rank-3 {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+
+    .badge-rank-4 {
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+    }
+
+    .badge-rank-5 {
+      background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+    }
+
+    .column-floating-badge .badge-icon {
+      font-size: 0.88rem;
+      line-height: 1;
+      display: inline-block;
+    }
+
+    .column-floating-badge .badge-num {
+      font-weight: 700;
+      font-size: 0.78rem;
+      letter-spacing: 0.2px;
+    }
+
+    .chart-column-item:hover .column-floating-badge {
+      transform: translateY(-4px) scale(1.1);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
+    }
+
+    .column-floating-badge::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 4px 4px 0 4px;
+      border-style: solid;
+      border-color: inherit transparent transparent transparent;
+    }
+
+    .column-label-row {
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 8px 0 34px;
+      gap: 4px;
+    }
+
+    .column-label-item {
+      width: 16%;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .column-app-icon {
+      font-size: 1.1rem;
+      transition: transform 0.2s;
+    }
+
+    .column-label-item:hover .column-app-icon {
+      transform: scale(1.2) translateY(-2px);
+    }
+
+    .column-app-name {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #334155;
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    .column-app-count {
+      font-size: 0.64rem;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    .column-action-btn {
+      margin-top: 3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 2px 7px;
+      border-radius: 5px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #ffffff;
+      background: #2563eb;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .column-action-btn:hover {
+      background: #1d4ed8;
+      transform: translateY(-1px);
+      box-shadow: 0 3px 8px rgba(37, 99, 235, 0.3);
+    }
+
+    /* Games Explorer Section */
+    .explorer-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .explorer-title {
+      font-family: 'Moul', cursive;
+      font-size: 1.1rem;
+      color: #1e3a8a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .games-catalog-container {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Modals */
+    .about-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.82);
+      backdrop-filter: blur(5px);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .about-modal.active {
+      display: flex;
+    }
+
+    .about-modal-content {
+      position: relative;
+      max-width: 90%;
+      max-height: 90%;
+      animation: zoomIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .about-modal-content img {
+      max-width: 100%;
+      max-height: 90vh;
+      border-radius: 16px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      border: 3px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .close-modal {
+      position: absolute;
+      top: -16px;
+      right: -16px;
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(180deg, #ff5e57 0%, #ee5a5a 100%);
+      color: white;
+      border: 2px solid white;
+      border-radius: 50%;
+      font-size: 22px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      transition: all 0.2s;
+    }
+
+    .close-modal:hover {
+      transform: scale(1.1) rotate(90deg);
+    }
+
+    @keyframes pulseGreen {
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      50% {
+        transform: scale(1.3);
+        opacity: 0.5;
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes zoomIn {
+      from {
+        transform: scale(0.85);
+        opacity: 0;
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    /* =========================================================
+       PREMIUM NIGHT / DARK MODE STYLING (Vibrant & Crystal Clear)
+       ========================================================= */
+    body.dark-mode {
+      --bg-dashboard: #0b1329;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      background-color: #0b1329;
+      background-image:
+        radial-gradient(circle at 10% 10%, rgba(59, 130, 246, 0.08) 0, transparent 40%),
+        radial-gradient(circle at 90% 90%, rgba(139, 92, 246, 0.08) 0, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.05) 0, transparent 60%);
+      color: #f8fafc;
+    }
+
+    body.dark-mode .sidebar {
+      background: #111c38;
+      border-color: #1e293b;
+      box-shadow: 4px 0 25px rgba(0, 0, 0, 0.5);
+    }
+
+    body.dark-mode .sidebar-brand {
+      border-color: #1e293b;
+      background: #0d162d;
+    }
+
+    body.dark-mode .brand-info h2 {
+      color: #93c5fd;
+      text-shadow: 0 0 12px rgba(147, 197, 253, 0.3);
+    }
+
+    body.dark-mode .sidebar-footer {
+      border-color: #1e293b;
+      background: #0d162d;
+    }
+
+    body.dark-mode .top-navbar {
+      background: #111c38;
+      border-color: #1e293b;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    body.dark-mode .search-box-wrapper {
+      background: #0b1329;
+      border-color: #334155;
+    }
+
+    body.dark-mode .search-box-wrapper:focus-within {
+      background: #111c38;
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 3.5px rgba(96, 165, 250, 0.22);
+    }
+
+    body.dark-mode .search-box {
+      color: #f8fafc;
+    }
+
+    body.dark-mode .search-box::placeholder {
+      color: #64748b;
+    }
+
+    body.dark-mode .search-icon {
+      color: #64748b;
+    }
+
+    body.dark-mode .search-box-wrapper:focus-within .search-icon {
+      color: #60a5fa;
+    }
+
+    body.dark-mode .search-clear-btn {
+      color: #64748b;
+    }
+
+    body.dark-mode .search-clear-btn:hover {
+      color: #f87171;
+    }
+
+    body.dark-mode .nav-pill,
+    body.dark-mode .sidebar-toggle-btn,
+    body.dark-mode .sidebar-toggle-close {
+      background: #1e293b;
+      border-color: #334155;
+      color: #f8fafc;
+    }
+
+    body.dark-mode .nav-pill:hover,
+    body.dark-mode .sidebar-toggle-btn:hover {
+      background: #334155;
+      color: #ffffff;
+      border-color: #475569;
+    }
+
+    body.dark-mode .menu-item {
+      color: #cbd5e1;
+    }
+
+    body.dark-mode .menu-item:hover {
+      background: #1e293b;
+      color: #60a5fa;
+    }
+
+    body.dark-mode .panel-card,
+    body.dark-mode .sub-card {
+      background: #152243;
+      border-color: #23355d;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    body.dark-mode .panel-header {
+      border-color: #23355d;
+    }
+
+    body.dark-mode .admin-name,
+    body.dark-mode .popular-name,
+    body.dark-mode .sub-card-num,
+    body.dark-mode .explorer-title,
+    body.dark-mode .panel-title {
+      color: #ffffff !important;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    body.dark-mode .panel-subtitle,
+    body.dark-mode .sub-card-title {
+      color: #94a3b8 !important;
+    }
+
+    /* Game Card Crystal Clear in Night Mode */
+    body.dark-mode .game-card {
+      background: linear-gradient(165deg, #18284e 0%, #101c38 100%) !important;
+      border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
+      box-shadow: 0 10px 25px -4px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+    }
+
+    body.dark-mode .game-card:hover {
+      border-color: #60a5fa !important;
+      box-shadow: 0 20px 35px -5px rgba(0, 0, 0, 0.7), 0 0 25px rgba(96, 165, 250, 0.25) !important;
+      transform: perspective(1000px) rotateX(4deg) translateY(-8px) !important;
+    }
+
+    body.dark-mode .game-card .icon {
+      background: linear-gradient(135deg, #243b6e 0%, #17284f 100%) !important;
+      border: 1px solid rgba(255, 255, 255, 0.18) !important;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    body.dark-mode .game-card h3 {
+      color: #ffffff !important;
+      font-weight: 700 !important;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8) !important;
+    }
+
+    body.dark-mode .game-card:hover h3 {
+      color: #93c5fd !important;
+      text-shadow: 0 0 10px rgba(147, 197, 253, 0.6) !important;
+    }
+
+    body.dark-mode .game-card p {
+      color: #cbd5e1 !important;
+      opacity: 0.95 !important;
+      line-height: 1.5 !important;
+    }
+
+    /* Category Filter Bar in Night Mode */
+    body.dark-mode .category-filter-bar {
+      background: #111c38 !important;
+      border: 1px solid #23355d !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+    }
+
+    body.dark-mode .setting-dropdown-menu {
+      background: #111c38 !important;
+      border-color: #23355d !important;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5) !important;
+    }
+
+    body.dark-mode .dropdown-item {
+      color: #f8fafc !important;
+    }
+
+    body.dark-mode .dropdown-item:hover {
+      background: #1e293b !important;
+      color: #60a5fa !important;
+    }
+
+    body.dark-mode .cat-filter-btn {
+      background: linear-gradient(180deg, #1f2f56 0%, #152243 100%) !important;
+      color: #e2e8f0 !important;
+      box-shadow: 0 4px 0 #0d162d, 0 6px 14px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    body.dark-mode .cat-filter-btn.active {
+      color: #ffffff !important;
+      box-shadow: 0 4px 0 #0d162d, 0 8px 18px rgba(0, 0, 0, 0.4) !important;
+    }
+
+    /* Column Chart Stage in Night Mode */
+    body.dark-mode .column-chart-stage {
+      background: linear-gradient(180deg, rgba(17, 28, 56, 0.9) 0%, rgba(13, 22, 45, 0.9) 100%) !important;
+      border-color: #23355d !important;
+    }
+
+    body.dark-mode .chart-grid-line {
+      border-color: #23355d !important;
+    }
+
+    body.dark-mode .chart-grid-line.line-0 {
+      border-color: #475569 !important;
+    }
+
+    body.dark-mode .column-app-name {
+      color: #ffffff !important;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5) !important;
+    }
+
+    /* Footer in Night Mode */
+    body.dark-mode .site-footer {
+      color: #94a3b8 !important;
+    }
+
+    /* Responsive */
+    @media (max-width: 1100px) {
+
+      .stat-cards-grid,
+      .secondary-stat-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .dashboard-analytics-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+
+      .top-navbar {
+        padding: 8px 10px;
+        gap: 8px;
+      }
+
+      .nav-left {
+        gap: 8px;
+      }
+
+      .search-box-wrapper {
+        padding: 0 8px 0 12px;
+        gap: 8px;
+      }
+
+      .search-box {
+        padding: 7px 0 !important;
+        font-size: 0.82rem;
+      }
+
+      .search-icon {
+        font-size: 0.88rem;
+      }
+
+      .dashboard-body {
+        padding: 12px;
+      }
+
+      .welcome-banner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .stat-cards-grid,
+      .secondary-stat-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 580px) {
+      .top-navbar {
+        padding: 6px 8px;
+        gap: 6px;
+      }
+
+      .nav-left {
+        gap: 6px;
+      }
+
+      .search-box-wrapper {
+        padding: 0 6px 0 10px;
+        gap: 6px;
+        border-radius: 10px;
+      }
+
+      .search-box {
+        padding: 6px 0 !important;
+        font-size: 0.78rem;
+      }
+
+      .search-icon {
+        font-size: 0.82rem;
+      }
+
+      .nav-right {
+        gap: 4px;
+      }
+
+      .nav-pill {
+        padding: 4px 7px;
+        font-size: 0.72rem;
+      }
+
+      .social-nav-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 0.8rem;
+        border-radius: 6px;
+      }
+    }
+  </style>
 </head>
+
 <body>
-    <div class="app-container" style="max-width: 800px;">
-        <header class="app-header">
-            <a href="../../index.html" class="btn-back">⬅️ ត្រលប់ក្រោយ (Back)</a>
-            <h1 style="color: #eab308;">កងបង្វិលចាប់ពាក្យ 🎡</h1>
-            <p>បង្វិលកងដើម្បីជ្រើសរើសពាក្យដោយចៃដន្យ</p>
-        </header>
+  <div class="krama-bar"></div>
 
-        <main class="spinner-area">
-            <div class="input-section">
-                <h3>បញ្ជូលពាក្យ (១ពាក្យក្នុង១បន្ទាត់)</h3>
-                <textarea id="items-input" rows="8">សៀវភៅ
-ប៊ិច
-ខ្មៅដៃ
-បន្ទាត់
-ជ័រលុប
-កាតាប
-តុ
-កៅអី</textarea>
-                <button id="btn-update" class="btn-secondary">ធ្វើបច្ចុប្បន្នភាពកង (Update Wheel)</button>
-            </div>
-            
-            <div class="wheel-section">
-                <div class="wheel-container">
-                    <canvas id="wheel-canvas" width="400" height="400"></canvas>
-                    <div class="pointer">▼</div>
-                </div>
-                <button id="btn-spin" class="btn-large" style="background: #eab308; margin-top: 20px;">បង្វិល (Spin!)</button>
-            </div>
-        </main>
+  <div class="app-layout">
 
-        <!-- Result Modal -->
-        <div id="result-modal" class="modal hidden">
-            <div class="modal-content">
-                <h2>ទទួលបាន៖</h2>
-                <h1 id="result-text" style="color: #eab308; font-size: 3rem; margin: 20px 0;">?</h1>
-                <button id="btn-close-modal" class="btn-large">បិទ (Close)</button>
-            </div>
+    <!-- Left Navigation Sidebar (Collapsible In/Out) -->
+    <aside class="sidebar" id="appSidebar">
+      <div class="sidebar-brand">
+        <div class="brand-left">
+          <img src="icon/icon.png" alt="CK Education" class="brand-icon">
+          <div class="brand-info">
+            <h2>CK EDUCATION</h2>
+            <span class="brand-badge" data-i18n="badge_online">ONLINE • SECURE</span>
+          </div>
         </div>
-    </div>
+        <button class="sidebar-toggle-close" onclick="toggleSidebar()" title="បិទ/លាក់ Sidebar">
+          <i class="fa-solid fa-angles-left"></i>
+        </button>
+      </div>
 
-    <script src="script.js"></script>
+      <nav class="sidebar-menu">
+        <div class="menu-section-title" data-i18n="menu_sec_main">ទូទៅ / MAIN</div>
+        <a href="javascript:void(0)" class="menu-item active" id="sidebar-menu-dashboard"
+          onclick="showDashboard(); switchSidebarTab(this);">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span data-i18n="menu_dashboard">ផ្ទាំងគ្រប់គ្រង</span>
+          <span class="menu-count">Dashboard</span>
+        </a>
+
+        <div class="menu-section-title" data-i18n="menu_sec_academic">ការសិក្សា / ACADEMIC</div>
+        <a href="#catalog-section" class="menu-item" id="sidebar-menu-math"
+          onclick="filterCategory('math', true); switchSidebarTab(this);">
+          <i class="fa-solid fa-calculator" style="color: #ef4444;"></i>
+          <span data-i18n="cat_math">គណិតវិទ្យា</span>
+          <span class="menu-count" data-i18n="count_math">១៦</span>
+        </a>
+        <a href="#catalog-section" class="menu-item" id="sidebar-menu-khmer"
+          onclick="filterCategory('khmer', true); switchSidebarTab(this);">
+          <i class="fa-solid fa-font" style="color: #10b981;"></i>
+          <span data-i18n="cat_khmer">ភាសាខ្មែរ</span>
+          <span class="menu-count" data-i18n="count_khmer">១៣</span>
+        </a>
+        <a href="#catalog-section" class="menu-item" id="sidebar-menu-tools"
+          onclick="filterCategory('tools', true); switchSidebarTab(this);">
+          <i class="fa-solid fa-toolbox" style="color: #0ea5e9;"></i>
+          <span data-i18n="cat_tools">ឧបករណ៍គ្រូ</span>
+          <span class="menu-count" data-i18n="count_tools">១៦</span>
+        </a>
+        <a href="#catalog-section" class="menu-item" id="sidebar-menu-brain"
+          onclick="filterCategory('brain', true); switchSidebarTab(this);">
+          <i class="fa-solid fa-brain" style="color: #a855f7;"></i>
+          <span data-i18n="cat_brain">ហ្គេមខួរក្បាល</span>
+          <span class="menu-count" data-i18n="count_brain">៩</span>
+        </a>
+
+        <div class="menu-section-title" data-i18n="menu_sec_popular">ឧបករណ៍ពេញនិយម / POPULAR</div>
+        <a href="games/notebook_cover/index.html" class="menu-item">
+          <i class="fa-solid fa-book-bookmark text-pink-500"></i>
+          <span data-i18n="pop_cover">ក្របសៀវភៅសរសេរ</span>
+          <span class="menu-count">NEW</span>
+        </a>
+        <a href="games/certificate_maker/index.html" class="menu-item">
+          <i class="fa-solid fa-award text-yellow-500"></i>
+          <span data-i18n="pop_cert">ប័ណ្ណសរសើរ</span>
+        </a>
+        <a href="games/flashcard_maker/index.html" class="menu-item">
+          <i class="fa-solid fa-tags text-indigo-500"></i>
+          <span data-i18n="pop_flashcard">ប័ណ្ណពាក្យ Flashcard</span>
+        </a>
+        <a href="games/create_qr/index.html" class="menu-item">
+          <i class="fa-solid fa-qrcode text-emerald-500"></i>
+          <span data-i18n="pop_qr">បង្កើត QR Code</span>
+        </a>
+
+        <div class="menu-section-title" data-i18n="menu_sec_system">ប្រព័ន្ធ / SYSTEM</div>
+        <a href="javascript:void(0)" onclick="openAboutModal()" class="menu-item">
+          <i class="fa-solid fa-circle-info text-teal-500"></i>
+          <span data-i18n="btn_about">អំពីប្រព័ន្ធ</span>
+        </a>
+        <a href="javascript:void(0)" onclick="openGiftModal()" class="menu-item">
+          <i class="fa-solid fa-heart text-rose-500"></i>
+          <span data-i18n="btn_gift">លើកទឹកចិត្ត</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="admin-avatar">
+          <i class="fa-solid fa-user-tie"></i>
+        </div>
+        <div class="admin-info">
+          <div class="admin-name" data-i18n="admin_name">លោកគ្រូ នាង នី</div>
+          <div class="admin-role">CK Education Admin • v2.8</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Panel -->
+    <main class="main-content" id="dashboard-top">
+
+      <!-- Top Sticky Navigation Bar -->
+      <header class="top-navbar">
+        <div class="nav-left">
+          <!-- Sidebar Toggle In/Out Button (Always accessible) -->
+          <button class="sidebar-toggle-btn" id="sidebarToggleBtn" onclick="toggleSidebar()"
+            title="បើក/បិទ របារចំហៀង (Sidebar In/Out)">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+
+          <div class="search-box-wrapper">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" id="globalSearchInput" class="search-box" data-i18n-ph="search_placeholder"
+              placeholder="ស្វែងរកហ្គេម ឬឧបករណ៍ (សិស្ស គ្រូ ថ្នាក់រៀន លំហាត់)..." oninput="handleSearch(this.value)"
+              autocomplete="off" spellcheck="false">
+            <button type="button" class="search-clear-btn" id="searchClearBtn" onclick="clearSearch()"
+              title="លុបការស្វែងរក (Clear search)">
+              <i class="fa-solid fa-circle-xmark"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="nav-right">
+          <!-- Friendly Live Telegram Button -->
+          <a href="https://t.me/mrneangny" target="_blank" rel="noopener noreferrer" class="telegram-nav-btn"
+            title="ទាក់ទងតាម Telegram: @mrneangny (លោកគ្រូ នាង នី)">
+            <span class="tg-icon-box">
+              <i class="fa-brands fa-telegram"></i>
+              <span class="tg-live-dot"></span>
+            </span>
+            <span class="tg-text">Telegram</span>
+          </a>
+
+          <!-- Facebook Button -->
+          <a href="https://web.facebook.com/profile.php?id=61591340289854" target="_blank" rel="noopener noreferrer"
+            class="social-nav-btn facebook-btn" title="Facebook: CamboTech Edu">
+            <i class="fa-brands fa-facebook-f"></i>
+          </a>
+
+          <!-- YouTube Button -->
+          <a href="https://www.youtube.com/@cambotech_edu" target="_blank" rel="noopener noreferrer"
+            class="social-nav-btn youtube-btn" title="YouTube: @cambotech_edu">
+            <i class="fa-brands fa-youtube"></i>
+          </a>
+
+          <!-- Language Switcher (Khmer <-> English) -->
+          <button class="nav-pill" id="langSwitchBtn" onclick="toggleLanguage()" title="ប្តូរភាសា / Switch Language">
+            <span id="langFlag">🇰🇭</span>
+            <span class="font-bold" id="langText">ខ្មែរ</span>
+          </button>
+
+          <!-- Font Weight Toggle (Bold <-> Regular) -->
+          <button class="nav-pill" id="fontWeightNavBtn" onclick="toggleFontWeight()"
+            title="ប្តូរកម្រាស់អក្សរ ដិត/ធម្មតា (Font Weight: Bold/Regular)">
+            <i class="fa-solid fa-bold" id="fontWeightNavIcon"></i>
+            <span class="text-xs font-bold" id="fontWeightNavText">ដិត</span>
+          </button>
+
+          <button class="nav-pill" onclick="toggleTheme()" title="ប្តូររចនាបថ យប់/ថ្ងៃ / Theme Mode">
+            <i class="fa-solid fa-sun" id="themeIcon"></i>
+          </button>
+
+          <!-- Setting Icon Button with Dropdown (containing លើកទឹកចិត្ត & អំពី) -->
+          <div class="setting-dropdown-wrapper" id="settingDropdownWrapper">
+            <button class="nav-pill setting-btn" id="settingBtn" onclick="toggleSettingDropdown(event)"
+              title="ការកំណត់ / Settings">
+              <i class="fa-solid fa-gear"></i>
+            </button>
+            <div class="setting-dropdown-menu" id="settingDropdownMenu">
+              <a class="dropdown-item" onclick="toggleFontWeight(); closeSettingDropdown();"
+                id="fontWeightDropdownItem">
+                <i class="fa-solid fa-bold" id="fontWeightDropdownIcon" style="color: #6366f1;"></i>
+                <span id="fontWeightDropdownText" data-i18n="btn_font_weight">កម្រាស់អក្សរ (ដិត/ធម្មតា)</span>
+              </a>
+              <a class="dropdown-item" onclick="openGiftModal(); closeSettingDropdown();">
+                <i class="fa-solid fa-heart" style="color: #f43f5e;"></i>
+                <span data-i18n="btn_gift">លើកទឹកចិត្ត</span>
+              </a>
+              <a class="dropdown-item" onclick="openAboutModal(); closeSettingDropdown();">
+                <i class="fa-solid fa-circle-info" style="color: #0d9488;"></i>
+                <span data-i18n="btn_about">អំពីប្រព័ន្ធ</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Dashboard Body Content -->
+      <div class="dashboard-body">
+
+        <!-- WRAPPER FOR DASHBOARD VIEW (Can be shown or hidden when filtering games) -->
+        <div id="dashboardSection" class="dashboard-section-wrapper">
+
+          <!-- Welcome Banner with User's requested Title -->
+          <section class="welcome-banner">
+            <div class="welcome-text">
+              <h1>
+                <span>🪁</span>
+                <span data-i18n="welcome_title">ល្បែងសិក្សាអប់រំសម្រាប់កុមារកម្ពុជាសូមស្វាគមន៍!</span>
+              </h1>
+              <p data-i18n="welcome_desc">មជ្ឈមណ្ឌលល្បែងសិក្សា និងឧបករណ៍ឌីជីថល ៦០ មុខ សម្រាប់កុមារ
+                និងលោកគ្រូអ្នកគ្រូខ្មែរ — រៀនសប្បាយ រៀនឆ្លាត
+                និងអនុវត្តន៍ផ្ទាល់!</p>
+            </div>
+            <div class="welcome-date-badge">
+              <i class="fa-regular fa-calendar-check text-yellow-300"></i>
+              <span id="currentDateDisplay">ថ្ងៃនេះ ឆ្នាំ២០២៦</span>
+            </div>
+          </section>
+
+          <!-- Compact & Vibrant Category Stat Cards Grid -->
+          <section class="stat-cards-grid">
+
+            <!-- Card 1: Math (គណិតវិទ្យា) -->
+            <div class="stat-card card-gradient-green"
+              onclick="filterCategory('math', true); switchSidebarTab(document.getElementById('sidebar-menu-math'));">
+              <div class="stat-card-header">
+                <span class="stat-title">
+                  <i class="fa-solid fa-calculator"></i> <span data-i18n="cat_math">គណិតវិទ្យា</span>
+                </span>
+                <div class="stat-icon-badge">
+                  🧮
+                </div>
+              </div>
+              <div class="stat-value" data-i18n="sub_math_val">១៦ កម្មវិធី</div>
+              <div class="stat-footer">
+                <span class="stat-status" data-i18n="count_math_badge">សរុប ១៦ មុខ</span>
+                <span class="stat-category"><i class="fa-solid fa-arrow-trend-up"></i> +97%</span>
+              </div>
+            </div>
+
+            <!-- Card 2: Khmer (ភាសាខ្មែរ) -->
+            <div class="stat-card card-gradient-blue"
+              onclick="filterCategory('khmer', true); switchSidebarTab(document.getElementById('sidebar-menu-khmer'));">
+              <div class="stat-card-header">
+                <span class="stat-title">
+                  <i class="fa-solid fa-book-open"></i> <span data-i18n="cat_khmer">ភាសាខ្មែរ</span>
+                </span>
+                <div class="stat-icon-badge">
+                  🔤
+                </div>
+              </div>
+              <div class="stat-value" data-i18n="sub_khmer_val">១៣ កម្មវិធី</div>
+              <div class="stat-footer">
+                <span class="stat-status" data-i18n="count_khmer_badge">សរុប ១៣ មុខ</span>
+                <span class="stat-category"><i class="fa-solid fa-arrow-trend-up"></i> +97%</span>
+              </div>
+            </div>
+
+            <!-- Card 3: Teacher Tools (ឧបករណ៍គ្រូ) -->
+            <div class="stat-card card-gradient-purple"
+              onclick="filterCategory('tools', true); switchSidebarTab(document.getElementById('sidebar-menu-tools'));">
+              <div class="stat-card-header">
+                <span class="stat-title">
+                  <i class="fa-solid fa-toolbox"></i> <span data-i18n="cat_tools">ឧបករណ៍គ្រូ</span>
+                </span>
+                <div class="stat-icon-badge">
+                  🧰
+                </div>
+              </div>
+              <div class="stat-value" data-i18n="sub_tools_val">១៦ ឧបករណ៍</div>
+              <div class="stat-footer">
+                <span class="stat-status" data-i18n="count_tools_badge">សរុប ១៦ មុខ</span>
+                <span class="stat-category"><i class="fa-solid fa-arrow-trend-up"></i> +98%</span>
+              </div>
+            </div>
+
+            <!-- Card 4: Brain Games (ហ្គេមខួរក្បាល) -->
+            <div class="stat-card card-gradient-orange"
+              onclick="filterCategory('brain', true); switchSidebarTab(document.getElementById('sidebar-menu-brain'));">
+              <div class="stat-card-header">
+                <span class="stat-title">
+                  <i class="fa-solid fa-brain"></i> <span data-i18n="cat_brain">ហ្គេមខួរក្បាល</span>
+                </span>
+                <div class="stat-icon-badge">
+                  🧠
+                </div>
+              </div>
+              <div class="stat-value" data-i18n="sub_brain_val">៩ ហ្គេម</div>
+              <div class="stat-footer">
+                <span class="stat-status" data-i18n="count_brain_badge">សរុប ៩ មុខ</span>
+                <span class="stat-category"><i class="fa-solid fa-arrow-trend-up"></i> +95%</span>
+              </div>
+            </div>
+
+          </section>
+
+          <!-- Middle Analytics Row: Top 5 Column Bar Chart -->
+          <section class="dashboard-analytics-grid" id="analytics-section">
+
+            <!-- Top 5 Column Bar Chart (ក្រាបសសរ) -->
+            <div class="panel-card">
+              <div class="panel-header">
+                <div>
+                  <h3 class="panel-title">
+                    <i class="fa-solid fa-chart-column text-blue-600"></i> <span data-i18n="chart_title">កម្មវិធី ៥
+                      ដែលមានអ្នកប្រើច្រើនជាងគេ</span>
+                  </h3>
+                  <p class="panel-subtitle" data-i18n="chart_subtitle">ក្រាបសសរវិភាគការចូលលេង និងប្រើប្រាស់ប្រចាំថ្ងៃ
+                    (Top
+                    Trending ប្តូរជារៀងរាល់ថ្ងៃ)</p>
+                </div>
+                <span
+                  class="px-2.5 py-0.5 bg-blue-50 text-blue-700 text-xs font-bold rounded-md border border-blue-200">
+                  <i class="fa-solid fa-ranking-star mr-1"></i> <span data-i18n="badge_chart">ប្រចាំថ្ងៃ</span>
+                </span>
+              </div>
+
+              <div class="column-chart-wrapper">
+                <!-- Column Bars Stage -->
+                <div class="column-chart-stage" id="dailyTop5Stage">
+                  <!-- Y-Axis markers -->
+                  <div class="chart-y-axis">
+                    <span>1.5k</span>
+                    <span>1.1k</span>
+                    <span>750</span>
+                    <span>350</span>
+                    <span>0</span>
+                  </div>
+                  <div class="chart-grid-line line-100"></div>
+                  <div class="chart-grid-line line-75"></div>
+                  <div class="chart-grid-line line-50"></div>
+                  <div class="chart-grid-line line-25"></div>
+                  <div class="chart-grid-line line-0"></div>
+
+                  <!-- 5 Dynamic Column Bars populated by renderDailyTop5() -->
+                </div>
+
+                <!-- Column Bottom Labels & Actions -->
+                <div class="column-label-row" id="dailyTop5Labels">
+                  <!-- 5 Dynamic Column Labels populated by renderDailyTop5() -->
+                </div>
+              </div>
+            </div>
+
+          </section>
+
+        </div> <!-- END OF DASHBOARD VIEW SECTION -->
+
+        <!-- Games Catalog Header & Filter Bar -->
+        <section class="explorer-header" id="catalog-section">
+          <div class="explorer-title">
+            <i class="fa-solid fa-gamepad text-blue-600"></i>
+            <span id="catalogTitleHeading" data-i18n="catalog_heading">បញ្ជីហ្គេម និងឧបករណ៍អប់រំទាំងអស់</span>
+          </div>
+        </section>
+
+        <!-- Category Capsule Bar (With Back to Dashboard Button) -->
+        <nav class="category-filter-bar" style="margin-bottom: 8px;">
+          <button class="cat-filter-btn" data-target="dashboard" onclick="showDashboard()">
+            <i class="fa-solid fa-chart-pie mr-1"></i> <span data-i18n="menu_dashboard">ផ្ទាំងគ្រប់គ្រង</span>
+          </button>
+          <button class="cat-filter-btn active" data-target="all" onclick="filterCategory('all', true)">
+            <span data-i18n="pill_all">🌟 ទាំងអស់ (៦២)</span>
+          </button>
+          <button class="cat-filter-btn filter-math" data-target="math" onclick="filterCategory('math', true)">
+            <span data-i18n="pill_math">🧮 គណិតវិទ្យា (១៦)</span>
+          </button>
+          <button class="cat-filter-btn filter-khmer" data-target="khmer" onclick="filterCategory('khmer', true)">
+            <span data-i18n="pill_khmer">🔤 ភាសាខ្មែរ (១៣)</span>
+          </button>
+          <button class="cat-filter-btn filter-tools" data-target="tools" onclick="filterCategory('tools', true)">
+            <span data-i18n="pill_tools">🧰 ឧបករណ៍គ្រូ (១៦)</span>
+          </button>
+          <button class="cat-filter-btn filter-brain" data-target="brain" onclick="filterCategory('brain', true)">
+            <span data-i18n="pill_brain">🧠 ហ្គេមខួរក្បាល (៩)</span>
+          </button>
+        </nav>
+
+        <!-- All Games Grid Catalog -->
+        <div class="games-catalog-container">
+
+          <!-- 1. Math Category -->
+          <div class="category" data-cat="math">
+            <span class="category-label cat-math" onclick="filterCategory('math', true)"><i class="cat-icon">🧮</i>
+              <span data-i18n="cat_math">គណិតវិទ្យា</span></span>
+            <div class="grid">
+              <a class="game-card" href="games/fraction/index.html">
+                <div class="icon">🍕</div>
+                <h3>ល្បែងប្រភាគ</h3>
+                <p>រៀនប្រភាគតាមរយៈការលាបពណ៌រង្វង់នំខេក។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/fast_math/index.html">
+                <div class="icon">⚡</div>
+                <h3>បូក-ដកលេខរហ័ស</h3>
+                <p>គិតលេខឱ្យលឿនមុនពេលអស់ម៉ោង។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/multiplication/index.html">
+                <div class="icon">✖️</div>
+                <h3>មេគុណ និងចែក</h3>
+                <p>ហ្វឹកហាត់តារាងគុណ និងចែកសម្រាប់កុមារ។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/clock/index.html">
+                <div class="icon">⏰</div>
+                <h3>ល្បែងទាយម៉ោង</h3>
+                <p>រៀនមើលម៉ោង និងនាទីឱ្យបានត្រឹមត្រូវ។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/currency/index.html">
+                <div class="icon">💵</div>
+                <h3>ស្គាល់លុយរៀល</h3>
+                <p>រៀនរាប់ និងគិតលុយជារូបិយប័ណ្ណខ្មែរ។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/geometry/index.html">
+                <div class="icon">🔺</div>
+                <h3>រាងធរណីមាត្រ</h3>
+                <p>ស្គាល់រាងផ្សេងៗដូចជា ត្រីកោណ ចតុកោណ។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/even_odd/index.html">
+                <div class="icon">🔢</div>
+                <h3>លេខគូ-សេស</h3>
+                <p>ញែកឱ្យដាច់រវាងលេខគូ និងលេខសេស។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/comparison/index.html">
+                <div class="icon">⚖️</div>
+                <h3>ប្រៀបធៀបលេខ</h3>
+                <p>ជ្រើសរើសសញ្ញាប្រៀបធៀបត្រឹមត្រូវ តិច ស្មើ ឬ ច្រើន។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/missing_number/index.html">
+                <div class="icon">❓</div>
+                <h3>រកលេខដែលបាត់</h3>
+                <p>ស្វែងរកលេខដែលបាត់ក្នុងលំដាប់លេខ។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/number_ordering/index.html">
+                <div class="icon">🔢</div>
+                <h3>តម្រៀបលេខ</h3>
+                <p>ហ្វឹកហាត់តម្រៀបលេខពីតូចទៅធំ ឬពីធំទៅតូច។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/spinning_wheel/index.html">
+                <div class="icon">🎡</div>
+                <h3>ល្បែងកង់លេខ</h3>
+                <p>បោះគ្រាប់ឃ្លីចូលក្នុងខ្ទង់រាយ និងខ្ទង់ដប់។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/math_quiz_grade/index.html">
+                <div class="icon">📐</div>
+                <h3>លំហាត់គណិត ថ្នាក់ទី១-៦</h3>
+                <p>ធ្វើលំហាត់គណិតវិទ្យាតាមកម្រិតថ្នាក់ទី១ ដល់ទី៦។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/unit_conversion/index.html">
+                <div class="icon">📏</div>
+                <h3>ការបម្លែងខ្នាត</h3>
+                <p>រៀនបម្លែងខ្នាតប្រវែង ម៉ាស់ និងចំណុះ។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/roman_numbers/index.html">
+                <div class="icon">🏛️</div>
+                <h3>លេខរ៉ូម៉ាំង និងលេខខ្មែរ</h3>
+                <p>ស្គាល់ និងបម្លែងលេខខ្មែរ ជាមួយលេខរ៉ូម៉ាំង។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/area_perimeter/index.html">
+                <div class="icon">📐</div>
+                <h3>ផ្ទៃក្រឡា និងបរិមាត្រ</h3>
+                <p>គណនាបរិមាត្រ និងផ្ទៃក្រឡារាងផ្សេងៗ។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/math_word_problems/index.html">
+                <div class="icon">📖</div>
+                <h3>ចំណោទគណិតវិទ្យា</h3>
+                <p>ដោះស្រាយចំណោទគណិតវិទ្យាថ្នាក់បឋម។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- 2. Khmer Language Category -->
+          <div class="category" data-cat="khmer">
+            <span class="category-label cat-khmer" onclick="filterCategory('khmer', true)"><i class="cat-icon">🔤</i>
+              <span data-i18n="cat_khmer">ភាសាខ្មែរ</span></span>
+            <div class="grid">
+              <a class="game-card" href="games/picture_matching/index.html">
+                <div class="icon">🖼️</div>
+                <h3>ផ្គូផ្គងរូបភាព</h3>
+                <p>រៀនពាក្យខ្មែរតាមរយៈរូបភាព។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/word_scramble/index.html">
+                <div class="icon">🔠</div>
+                <h3>តម្រៀបពាក្យ ឬល្បះ</h3>
+                <p>រៀបអក្សរឱ្យចេញជាពាក្យត្រឹមត្រូវ។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/word_spinner/index.html">
+                <div class="icon">🎡</div>
+                <h3>កងបង្វិលចាប់ពាក្យ</h3>
+                <p>បង្វិលកងដើម្បីជ្រើសរើសពាក្យដោយចៃដន្យ។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/hangman/index.html">
+                <div class="icon">📝</div>
+                <h3>ទាយពាក្យ</h3>
+                <p>ទាយអក្សរដើម្បីបំពេញពាក្យឱ្យបានត្រឹមត្រូវ។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/flashcards/index.html">
+                <div class="icon">📇</div>
+                <h3>បណ្ណពាក្យ</h3>
+                <p>កាតពាក្យ (Flashcards) សម្រាប់ទន្ទេញមេរៀន។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/match_pairs/index.html">
+                <div class="icon">🔗</div>
+                <h3>អូសខ្សែភ្ជាប់</h3>
+                <p>ស្វែងរកគូ អូសខ្សែភ្ជាប់ពាក្យទៅនឹងរូបភាព។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/tts/index.html">
+                <div class="icon">🔊</div>
+                <h3>អានអត្ថបទ</h3>
+                <p>វាយអត្ថបទ ហើយឱ្យកម្មវិធីអានជាសំឡេង។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/khmer_consonants/index.html">
+                <div class="icon">🔤</div>
+                <h3>ព្យញ្ជនៈ និងស្រៈខ្មែរ</h3>
+                <p>រៀន ស្គាល់ និងទន្ទេញព្យញ្ជនៈ ស្រៈនិស្ស័យខ្មែរ។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/synonym/index.html">
+                <div class="icon">🟰</div>
+                <h3>ពាក្យដូច</h3>
+                <p>ស្វែងរកពាក្យន័យដូច។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/antonym/index.html">
+                <div class="icon">❌</div>
+                <h3>ពាក្យផ្ទុយ</h3>
+                <p>ស្វែងរកពាក្យន័យផ្ទុយ។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/grammar_parts/index.html">
+                <div class="icon">📚</div>
+                <h3>ថ្នាក់ពាក្យក្នុងភាសាខ្មែរ</h3>
+                <p>ស្គាល់នាម កិរិយាស័ព្ទ និងគុណនាម។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/proverbs_quiz/index.html">
+                <div class="icon">📜</div>
+                <h3>សុភាសិត និងកម្រងពាក្យ</h3>
+                <p>បំពេញ និងស្វែងយល់ន័យសុភាសិតខ្មែរ។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/spelling_bee/index.html">
+                <div class="icon">✍️</div>
+                <h3>ល្បែងអក្ខរាវិរុទ្ធខ្មែរ</h3>
+                <p>ជ្រើសរើសពាក្យដែលសរសេរត្រូវតាមអក្ខរាវិរុទ្ធ។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- 3. Teacher Tools Category -->
+          <div class="category" data-cat="tools">
+            <span class="category-label cat-tools" onclick="filterCategory('tools', true)"><i class="cat-icon">🧰</i>
+              <span data-i18n="cat_tools">ឧបករណ៍គ្រូ</span></span>
+            <div class="grid">
+              <a class="game-card" href="games/exercise_card/index.html">
+                <div class="icon">🎴</div>
+                <h3>បង្កើតលំហាត់ស្វ័យប្រវត្តិ</h3>
+                <p>បង្កើតកាតលំហាត់ទំហំកាតសិស្ស (8.56cm x 5.4cm) សម្រាប់បោះពុម្ព ឬ PNG។</p>
+                <span class="play">🎮 ចាប់ផ្តើមប្រើ ➔</span>
+              </a>
+              <a class="game-card" href="games/flashcard_maker/index.html">
+                <div class="icon">🏷️</div>
+                <h3>បង្កើតប័ណ្ណពាក្យ</h3>
+                <p>បង្កើតប័ណ្ណពាក្យ (Flashcards) ទំហំ A4 អាចប្តូរពណ៌ ស៊ុម វ៉ាត់ធើមើក និងទាញយកជា PDF/PNG។</p>
+                <span class="play">🎮 ចាប់ផ្តើមប្រើ ➔</span>
+              </a>
+              <a class="game-card" href="games/certificate_maker/index.html">
+                <div class="icon">📜</div>
+                <h3>បង្កើតប័ណ្ណសរសើរ</h3>
+                <p>បង្កើតប័ណ្ណសរសើរស្អាតៗសម្រាប់សិស្សពូកែ ទំហំ A4 អាចបញ្ចូលរូបថត និងទាញយកជា PDF/PNG ឬបោះពុម្ព។</p>
+                <span class="play">🎮 ចាប់ផ្តើមប្រើ ➔</span>
+              </a>
+              <a class="game-card" href="games/lesson_plans/">
+                <div class="icon">📖</div>
+                <h3>បង្កើតកិច្ចតែងការបង្រៀន</h3>
+                <p>បង្កើតកិច្ចតែងការបង្រៀនដោយស្វ័យប្រវត្តិ តែសូមត្រួតពិនិត្យឱ្យបានត្រឹមត្រូវមុនយកទៅប្រើប្រាស់ ព្រោះAi
+                  មិនបានត្រឹមត្រូវ១០០%ទេ។</p>
+                <span class="play">🎮 ចាប់ផ្តើមប្រើ ➔</span>
+              </a>
+              <a class="game-card" href="games/name_spinner/index.html">
+                <div class="icon">👤</div>
+                <h3>កងបង្វិលចាប់ឈ្មោះ</h3>
+                <p>បង្វិលកងដើម្បីហៅឈ្មោះសិស្ស។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/group_maker/index.html">
+                <div class="icon">👥</div>
+                <h3>រៀបសិស្សជាក្រុម</h3>
+                <p>បែងចែកសិស្សជាក្រុមដោយស្វ័យប្រវត្តិ។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/random_number/index.html">
+                <div class="icon">🎲</div>
+                <h3>ចាប់លេខចៃដន្យ</h3>
+                <p>ចាប់លេខរៀងដោយចៃដន្យ (Randomizer)។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/timer/index.html">
+                <div class="icon">⏱️</div>
+                <h3>នាឡិកាកំណត់ម៉ោង</h3>
+                <p>កំណត់ពេលធ្វើលំហាត់ក្នុងថ្នាក់។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/scoreboard/index.html">
+                <div class="icon">🏆</div>
+                <h3>តារាងពិន្ទុក្រុម</h3>
+                <p>កត់ត្រា និងបូកពិន្ទុសម្រាប់ក្រុមនីមួយៗ។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/whiteboard/index.html">
+                <div class="icon">✏️</div>
+                <h3>ក្តារខៀនឌីជីថល</h3>
+                <p>គូររូប និងសរសេរពន្យល់នៅលើក្តារ។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/database/index.html">
+                <div class="icon">🗄️</div>
+                <h3>បញ្ជីចុះឈ្មោះសិស្ស</h3>
+                <p>គ្រប់គ្រងបញ្ជីឈ្មោះ និងទាញយកជា Excel។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/student_id_card/index.html">
+                <div class="icon">🪪</div>
+                <h3>បង្កើតប័ណ្ណសិស្ស</h3>
+                <p>បង្កើតប័ណ្ណសម្គាល់ខ្លួនសិស្ស និងទាញយកជា PDF។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/seating_chart/index.html">
+                <div class="icon">🪑</div>
+                <h3>រៀបចំកន្លែងអង្គុយសិស្ស</h3>
+                <p>រៀបចំ និងបែងចែកតុរៀនសិស្សក្នុងថ្នាក់។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/create_qr/index.html">
+                <div class="icon">📱</div>
+                <h3>បង្កើត QR Code</h3>
+                <p>បង្កើត QR Code ស្អាតៗសម្រាប់តំណភ្ជាប់ (Link) ឬអត្ថបទ។</p>
+                <span class="play">🎮 ចាប់ផ្តើមប្រើ ➔</span>
+              </a>
+              <a class="game-card" href="games/notebook_cover/index.html">
+                <div class="icon">📔</div>
+                <h3>បង្កើតក្របសៀវភៅសរសេរ</h3>
+                <p>រចនាក្របសៀវភៅសរសេរសិស្សស្អាតៗ (១៥.៨ x ២០.៥ ស.ម) ទម្រង់បុរាណ និងទំនើប ទាញយកជា PDF/រូបភាព។</p>
+                <span class="play">🎮 ចាប់ផ្តើមប្រើ ➔</span>
+              </a>
+              <a class="game-card" href="games/khmer_word_collection/index.html">
+                <div class="icon">📚</div>
+                <h3>បណ្ដុំពាក្យភាសាខ្មែរ ទី១-ទី៦</h3>
+                <p>បណ្ដុំពាក្យគន្លឹះភាសាខ្មែរថ្នាក់ទី១ ដល់ ទី៦ សម្រាប់រៀន អាន និងទាញយកជា Word/PDF។</p>
+                <span class="play">🎮 ចាប់ផ្តើមប្រើ ➔</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- 4. Brain Games Category -->
+          <div class="category" data-cat="brain">
+            <span class="category-label cat-brain" onclick="filterCategory('brain', true)"><i class="cat-icon">🧠</i>
+              <span data-i18n="cat_brain">ហ្គេមខួរក្បាល</span></span>
+            <div class="grid">
+              <a class="game-card" href="games/memory/index.html">
+                <div class="icon">🧠</div>
+                <h3>ល្បែងចងចាំ</h3>
+                <p>បើកកាតផ្គូផ្គងរូប និងពាក្យដើម្បីហ្វឹកហាត់ការចងចាំ។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/simon_says/index.html">
+                <div class="icon">🌈</div>
+                <h3>ស្គាល់ និងចងចាំពណ៌</h3>
+                <p>រៀនស្គាល់ពណ៌ និងចងចាំពណ៌តាមលំដាប់ឱ្យបានត្រឹមត្រូវ។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/sliding_puzzle/index.html">
+                <div class="icon">🧩</div>
+                <h3>ល្បែងតម្រៀបប្រអប់លេខ</h3>
+                <p>អូសតម្រៀបប្រអប់លេខពីតូចទៅធំឱ្យត្រូវតាមលំដាប់។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/maze/index.html">
+                <div class="icon">🌀</div>
+                <h3>ល្បែងស្វែងរកច្រកចេញ</h3>
+                <p>បញ្ជាតួអង្គដើរតាមផ្លូវវង្វេងដើម្បីទៅដល់គោលដៅ។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/sudoku/index.html">
+                <div class="icon">🔢</div>
+                <h3>សុដូកូកុមារ 4x4</h3>
+                <p>តម្រៀបរូបភាព ឬលេខ ៤x៤ ដោយមិនឱ្យជាន់គ្នាក្នុងជួរ។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/drawing/index.html">
+                <div class="icon">💡</div>
+                <h3>គូររូបភាព គំនូរ</h3>
+                <p>រៀនគូររូបភាពលេងកម្សាន្ត និងអាចទាញរូបភាពបាន។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/puzzle_image/index.html">
+                <div class="icon">🖼</div>
+                <h3>ល្បែងផ្គុំរូបភាព</h3>
+                <p>ផ្គុំរូបភាពឱ្យបានត្រឹមត្រូវតាមការគិត ការចងចាំ។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/pattern_logic/index.html">
+                <div class="icon">🧩</div>
+                <h3>តក្កវិទ្យា និងលំដាប់រូបភាព</h3>
+                <p>ទាយរូបភាព ឬលំដាប់បន្ទាប់តាមតក្កវិទ្យា។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+              <a class="game-card" href="games/riddles_khmer/index.html">
+                <div class="icon">❓</div>
+                <h3>ទាយប្រស្នាខ្មែរ</h3>
+                <p>ដោះស្រាយប្រស្នាប្រដៅ និងពាក្យបណ្តៅខ្មែរ។</p>
+                <span class="play">🎮 ចាប់ផ្តើមលេង ➔</span>
+              </a>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <footer class="site-footer" style="margin-top: auto;">
+        <span data-i18n="footer_text">🪁 ល្បែងសិក្សាអប់រំសម្រាប់កុមារកម្ពុជា — សាងសង់ដោយក្តីស្រលាញ់ សម្រាប់កុមារកម្ពុជា
+          ❤️ រៀបរៀងដោយ៖ លោកគ្រូ នាង នី ❤️</span>
+      </footer>
+
+    </main>
+
+  </div>
+
+  <!-- About Modal -->
+  <div class="about-modal" id="aboutModal">
+    <div class="about-modal-content">
+      <button class="close-modal" onclick="closeAboutModal()">×</button>
+      <img src="photo/about.png" alt="About"
+        onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 300%22><rect fill=%22%23f0f0f0%22 width=%22400%22 height=%22300%22/><text x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2220%22 fill=%22%23666%22>Image not found</text></svg>'">
+    </div>
+  </div>
+
+  <!-- Gift / Support Modal -->
+  <div class="about-modal" id="giftModal">
+    <div class="about-modal-content">
+      <button class="close-modal" onclick="closeGiftModal()">×</button>
+      <img src="photo/gift.png" alt="Gift"
+        onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 300%22><rect fill=%22%23f0f0f0%22 width=%22400%22 height=%22300%22/><text x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2220%22 fill=%22%23666%22>Image not found</text></svg>'">
+    </div>
+  </div>
+
+  <script>
+    // i18n Translation Dictionary (Khmer <-> English)
+    const translations = {
+      km: {
+        page_title: "CK Education — ល្បែងសិក្សាសម្រាប់កុមារកម្ពុជា",
+        badge_online: "ONLINE • SECURE",
+        menu_sec_main: "ទូទៅ / MAIN",
+        menu_dashboard: "ផ្ទាំងគ្រប់គ្រង",
+        menu_sec_academic: "ការសិក្សា / ACADEMIC",
+        cat_math: "គណិតវិទ្យា",
+        cat_khmer: "ភាសាខ្មែរ",
+        cat_tools: "ឧបករណ៍គ្រូ",
+        cat_brain: "ហ្គេមខួរក្បាល",
+        count_math: "១៦",
+        count_khmer: "១៣",
+        count_tools: "១៦",
+        count_brain: "៩",
+        menu_sec_popular: "ឧបករណ៍ពេញនិយម / POPULAR",
+        pop_cover: "ក្របសៀវភៅសរសេរ",
+        pop_cert: "ប័ណ្ណសរសើរ",
+        pop_flashcard: "ប័ណ្ណពាក្យ Flashcard",
+        pop_qr: "បង្កើត QR Code",
+        menu_sec_system: "ប្រព័ន្ធ / SYSTEM",
+        btn_about: "អំពី",
+        btn_gift: "លើកទឹកចិត្ត",
+        btn_font_weight: "កម្រាស់អក្សរ (ដិត/ធម្មតា)",
+        admin_name: "លោកគ្រូ នាង នី",
+        search_placeholder: "ស្វែងរកហ្គេម ឬឧបករណ៍ (សិស្ស គ្រូ ថ្នាក់រៀន លំហាត់)...",
+        welcome_title: "ល្បែងសិក្សាអប់រំសម្រាប់កុមារកម្ពុជាសូមស្វាគមន៍!",
+        welcome_desc: "មជ្ឈមណ្ឌលល្បែងសិក្សា និងឧបករណ៍ឌីជីថល ៦២ មុខ សម្រាប់កុមារ និងលោកគ្រូអ្នកគ្រូខ្មែរ — រៀនសប្បាយ រៀនឆ្លាត និងអនុវត្តន៍ផ្ទាល់!",
+        stat_total_apps: "កម្មវិធីសរុប",
+        stat_total_apps_val: "៦២ មុខ",
+        stat_total_apps_status: "STATUS : ពេញលេញ",
+        stat_total_apps_cat: "CATEGORY : ៤ ផ្នែក",
+        stat_users: "អ្នកចូលប្រើប្រាស់",
+        stat_users_val: "១,២៥០+ នាក់",
+        stat_users_status: "STATUS : សកម្ម",
+        stat_users_growth: "កើនឡើង +១៨%",
+        stat_exercises: "បង្កើត និងអនុវត្ត",
+        stat_exercises_val: "៨,៩២០+ លើក",
+        stat_exercises_status: "STATUS : ឥតគិតថ្លៃ",
+        stat_exercises_desc: "ប័ណ្ណ & លំហាត់",
+        stat_rating: "អត្រាពេញចិត្ត",
+        stat_rating_status: "STATUS : ល្អប្រសើរ",
+        stat_rating_stars: "កម្រិតវាយតម្លៃ ៥★",
+        sub_math_val: "១៦ កម្មវិធី",
+        sub_khmer_val: "១៣ កម្មវិធី",
+        sub_tools_val: "១៦ ឧបករណ៍",
+        sub_brain_val: "៩ ហ្គេម",
+        count_math_badge: "សរុប ១៦ មុខ",
+        count_khmer_badge: "សរុប ១៣ មុខ",
+        count_tools_badge: "សរុប ១៦ មុខ",
+        count_brain_badge: "សរុប ៩ មុខ",
+        chart_title: "កម្មវិធី ៥ ដែលមានអ្នកប្រើច្រើនជាងគេ",
+        chart_subtitle: "ក្រាបសសរវិភាគការចូលលេង និងប្រើប្រាស់ប្រចាំថ្ងៃ (Top Trending ប្តូរជារៀងរាល់ថ្ងៃ)",
+        badge_chart: "ប្រចាំថ្ងៃ",
+        chart_c1_badge: "១,៤២០",
+        chart_c2_badge: "១,២៨០",
+        chart_c3_badge: "១,១៥០",
+        chart_c4_badge: "៩៨០",
+        chart_c5_badge: "៨៩០",
+        c1_name: "ប័ណ្ណសរសើរ",
+        c2_name: "ប័ណ្ណពាក្យ",
+        c3_name: "ប្រភាគ",
+        c4_name: "QR Code",
+        c5_name: "ចាប់ឈ្មោះ",
+        btn_use: "ប្រើ",
+        btn_play: "លេង",
+        view_all_games_btn: "ស្វែងរកហ្គេមទាំងអស់ (៦២ មុខ)",
+        catalog_heading: "បញ្ជីហ្គេម និងឧបករណ៍អប់រំទាំងអស់",
+        pill_all: "🌟 ទាំងអស់ (៦២)",
+        pill_math: "🧮 គណិតវិទ្យា (១៦)",
+        pill_khmer: "🔤 ភាសាខ្មែរ (១៣)",
+        pill_tools: "🧰 ឧបករណ៍គ្រូ (១៦)",
+        pill_brain: "🧠 ហ្គេមខួរក្បាល (៩)",
+        footer_text: "🪁 ល្បែងសិក្សាអប់រំសម្រាប់កុមារកម្ពុជា — សាងសង់ដោយក្តីស្រលាញ់ សម្រាប់កុមារកម្ពុជា ❤️ រៀបរៀងដោយ៖ លោកគ្រូ នាង នី ❤️"
+      },
+      en: {
+        page_title: "CK Education — Educational Games for Cambodian Children",
+        badge_online: "ONLINE • SECURE",
+        menu_sec_main: "MAIN MENU",
+        menu_dashboard: "Dashboard",
+        menu_sec_academic: "ACADEMIC",
+        cat_math: "Mathematics",
+        cat_khmer: "Khmer Language",
+        cat_tools: "Teacher Tools",
+        cat_brain: "Brain Games",
+        count_math: "16",
+        count_khmer: "13",
+        count_tools: "16",
+        count_brain: "9",
+        menu_sec_popular: "POPULAR TOOLS",
+        pop_cover: "Notebook Cover",
+        pop_cert: "Certificate Maker",
+        pop_flashcard: "Flashcard Maker",
+        pop_qr: "Create QR Code",
+        menu_sec_system: "SYSTEM",
+        btn_about: "About",
+        btn_gift: "Support",
+        btn_font_weight: "Font Weight (Bold/Regular)",
+        admin_name: "Teacher Neang Ny",
+        search_placeholder: "Search games or tools (students, teachers, class, quiz)...",
+        welcome_title: "Welcome to Educational Learning Games for Children!",
+        welcome_desc: "The hub of 62 digital educational games & tools for Cambodian students and teachers — Fun, Smart, and Interactive Learning!",
+        stat_total_apps: "Total Programs",
+        stat_total_apps_val: "62 Apps",
+        stat_total_apps_status: "STATUS : FULL",
+        stat_total_apps_cat: "CATEGORY : 4 DEPARTMENTS",
+        stat_users: "Active Users",
+        stat_users_val: "1,250+ Users",
+        stat_users_status: "STATUS : ACTIVE",
+        stat_users_growth: "+18% Increase",
+        stat_exercises: "Generated & Practice",
+        stat_exercises_val: "8,920+ Times",
+        stat_exercises_status: "STATUS : FREE",
+        stat_exercises_desc: "Cards & Exercises",
+        stat_rating: "Satisfaction Rate",
+        stat_rating_status: "STATUS : EXCELLENT",
+        stat_rating_stars: "5★ Rating Grade",
+        sub_math_val: "16 Programs",
+        sub_khmer_val: "13 Programs",
+        sub_tools_val: "16 Tools",
+        sub_brain_val: "9 Games",
+        count_math_badge: "Total 16 Items",
+        count_khmer_badge: "Total 13 Items",
+        count_tools_badge: "Total 16 Items",
+        count_brain_badge: "Total 9 Items",
+        chart_title: "Top 5 Most Popular Programs",
+        chart_subtitle: "Daily trending usage & play analytics (Rotates automatically every day)",
+        badge_chart: "Daily Trend",
+        chart_c1_badge: "1,420",
+        chart_c2_badge: "1,280",
+        chart_c3_badge: "1,150",
+        chart_c4_badge: "980",
+        chart_c5_badge: "890",
+        c1_name: "Certificates",
+        c2_name: "Flashcards",
+        c3_name: "Fractions",
+        c4_name: "QR Code",
+        c5_name: "Name Spinner",
+        btn_use: "Open",
+        btn_play: "Play",
+        view_all_games_btn: "Explore All Games (62 Apps)",
+        catalog_heading: "All Educational Games & Teacher Tools (62 Apps)",
+        pill_all: "🌟 All (62)",
+        pill_math: "🧮 Math (16)",
+        pill_khmer: "🔤 Khmer (13)",
+        pill_tools: "🧰 Tools (16)",
+        pill_brain: "🧠 Brain (9)",
+        footer_text: "🪁 Educational Learning Games for Children — Built with Love for Cambodian Children ❤️ Created by: Teacher Neang Ny ❤️"
+      }
+    };
+
+    let currentLanguage = 'km';
+
+    function setLanguage(lang) {
+      currentLanguage = lang;
+      localStorage.setItem('site_lang', lang);
+
+      const dict = translations[lang] || translations.km;
+
+      // Update document title
+      document.title = dict.page_title;
+
+      // Update flag and text on navbar
+      const langFlag = document.getElementById('langFlag');
+      const langText = document.getElementById('langText');
+      if (langFlag && langText) {
+        if (lang === 'en') {
+          langFlag.textContent = '🇬🇧';
+          langText.textContent = 'EN';
+        } else {
+          langFlag.textContent = '🇰🇭';
+          langText.textContent = 'ខ្មែរ';
+        }
+      }
+
+      // Update all elements with data-i18n
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) {
+          el.textContent = dict[key];
+        }
+      });
+
+      // Update placeholders
+      document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+        const key = el.getAttribute('data-i18n-ph');
+        if (dict[key]) {
+          el.placeholder = dict[key];
+        }
+      });
+
+      // Update Date
+      updateKhmerDate();
+
+      // Update font weight labels
+      applyFontWeight(document.body.classList.contains('font-regular') ? 'regular' : 'bold');
+
+      // Update Daily Top 5 Chart with language strings
+      renderDailyTop5();
+    }
+
+    function toggleLanguage() {
+      const nextLang = currentLanguage === 'km' ? 'en' : 'km';
+      setLanguage(nextLang);
+    }
+
+    // Dynamic Daily Trending Top 5 System
+    const featuredAppList = [
+      { id: 'notebook_cover', nameKm: 'ក្របសៀវភៅ', nameEn: 'Notebook Cover', icon: '📔', url: 'games/notebook_cover/index.html', isTool: true },
+      { id: 'cert', nameKm: 'ប័ណ្ណសរសើរ', nameEn: 'Certificates', icon: '📜', url: 'games/certificate_maker/index.html', isTool: true },
+      { id: 'flashcard', nameKm: 'ប័ណ្ណពាក្យ Flashcard', nameEn: 'Flashcards', icon: '🏷️', url: 'games/flashcard_maker/index.html', isTool: true },
+      { id: 'fraction', nameKm: 'ល្បែងប្រភាគ', nameEn: 'Fractions', icon: '🍕', url: 'games/fraction/index.html', isTool: false },
+      { id: 'qr', nameKm: 'បង្កើត QR Code', nameEn: 'QR Code', icon: '📱', url: 'games/create_qr/index.html', isTool: true },
+      { id: 'name_spinner', nameKm: 'ចាប់ឈ្មោះ', nameEn: 'Name Spinner', icon: '👤', url: 'games/name_spinner/index.html', isTool: false },
+      { id: 'fast_math', nameKm: 'បូក-ដកលេខរហ័ស', nameEn: 'Fast Math', icon: '⚡', url: 'games/fast_math/index.html', isTool: false },
+      { id: 'multiplication', nameKm: 'មេគុណ និងចែក', nameEn: 'Multiplication', icon: '✖️', url: 'games/multiplication/index.html', isTool: false },
+      { id: 'picture_match', nameKm: 'ផ្គូផ្គងរូបភាព', nameEn: 'Picture Match', icon: '🖼️', url: 'games/picture_matching/index.html', isTool: false },
+      { id: 'word_scramble', nameKm: 'តម្រៀបពាក្យ', nameEn: 'Word Scramble', icon: '🔠', url: 'games/word_scramble/index.html', isTool: false },
+      { id: 'word_spinner', nameKm: 'ចាប់ពាក្យ', nameEn: 'Word Spinner', icon: '🎡', url: 'games/word_spinner/index.html', isTool: false },
+      { id: 'hangman', nameKm: 'ទាយពាក្យ Hangman', nameEn: 'Hangman', icon: '📝', url: 'games/hangman/index.html', isTool: false },
+      { id: 'drawing', nameKm: 'គូររូប និងផាត់ពណ៌', nameEn: 'Drawing & Paint', icon: '🎨', url: 'games/drawing/index.html', isTool: true },
+      { id: 'student_id', nameKm: 'កាតសិស្ស', nameEn: 'Student ID Card', icon: '🪪', url: 'games/student_id_card/index.html', isTool: true },
+      { id: 'clock', nameKm: 'ល្បែងទាយម៉ោង', nameEn: 'Clock Game', icon: '⏰', url: 'games/clock/index.html', isTool: false },
+      { id: 'currency', nameKm: 'ស្គាល់លុយរៀល', nameEn: 'Khmer Currency', icon: '💵', url: 'games/currency/index.html', isTool: false },
+      { id: 'whiteboard', nameKm: 'ក្ដារខៀនអប់រំ', nameEn: 'Whiteboard', icon: '📋', url: 'games/whiteboard/index.html', isTool: true },
+      { id: 'seating', nameKm: 'ប្លង់អង្គុយសិស្ស', nameEn: 'Seating Chart', icon: '🪑', url: 'games/seating_chart/index.html', isTool: true },
+      { id: 'sudoku', nameKm: 'ល្បែង Sudoku', nameEn: 'Sudoku Kids', icon: '🧩', url: 'games/sudoku/index.html', isTool: false },
+      { id: 'memory', nameKm: 'ផ្ចាញ់ការចងចាំ', nameEn: 'Memory Game', icon: '🧠', url: 'games/memory/index.html', isTool: false },
+      { id: 'maze', nameKm: 'ល្បែងរកផ្លូវ Maze', nameEn: 'Maze Game', icon: '🐰', url: 'games/maze/index.html', isTool: false },
+      { id: 'lesson_plans', nameKm: 'គំរូកិច្ចតែងការ', nameEn: 'Lesson Plans', icon: '📚', url: 'games/lesson_plans/index.html', isTool: true },
+      { id: 'quiz', nameKm: 'លំហាត់គណិត ១-៦', nameEn: 'Math Quiz Grade', icon: '📐', url: 'games/math_quiz_grade/index.html', isTool: false },
+      { id: 'unit', nameKm: 'ការបម្លែងខ្នាត', nameEn: 'Unit Conversion', icon: '📏', url: 'games/unit_conversion/index.html', isTool: false },
+      { id: 'roman', nameKm: 'លេខរ៉ូម៉ាំង', nameEn: 'Roman Numbers', icon: '🏛️', url: 'games/roman_numbers/index.html', isTool: false },
+      { id: 'sliding_puzzle', nameKm: 'ល្បែងរុញលេខ', nameEn: 'Sliding Puzzle', icon: '🔢', url: 'games/sliding_puzzle/index.html', isTool: false },
+      { id: 'tts', nameKm: 'អានជាសំឡេង TTS', nameEn: 'Voice TTS', icon: '🔊', url: 'games/tts/index.html', isTool: true }
+    ];
+
+    function toKhmerDigits(num) {
+      const kmDigits = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
+      return num.toString().replace(/[0-9]/g, d => kmDigits[d]);
+    }
+
+    function formatDailyNumber(num, isKhmer) {
+      const formatted = num.toLocaleString('en-US');
+      return isKhmer ? toKhmerDigits(formatted) : formatted;
+    }
+
+    function getDailyTop5Apps() {
+      const now = new Date();
+      // Daily unique key based on year, month, date (e.g. 20260826)
+      const dateKey = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
+
+      let s = dateKey;
+      function pseudoRandom() {
+        s = (s * 9301 + 49297) % 233280;
+        return s / 233280;
+      }
+
+      const listCopy = [...featuredAppList];
+      const selected = [];
+      for (let i = 0; i < 5 && listCopy.length > 0; i++) {
+        const idx = Math.floor(pseudoRandom() * listCopy.length);
+        selected.push(listCopy.splice(idx, 1)[0]);
+      }
+
+      const rankConfigs = [
+        { minCount: 1380, maxCount: 1520, minPct: 96, maxPct: 99, badgeClass: 'badge-rank-1', barClass: 'bar-rank-1', icon: '🥇' },
+        { minCount: 1210, maxCount: 1340, minPct: 91, maxPct: 95, badgeClass: 'badge-rank-2', barClass: 'bar-rank-2', icon: '🥈' },
+        { minCount: 1040, maxCount: 1180, minPct: 86, maxPct: 90, badgeClass: 'badge-rank-3', barClass: 'bar-rank-3', icon: '🥉' },
+        { minCount: 880, maxCount: 1010, minPct: 80, maxPct: 85, badgeClass: 'badge-rank-4', barClass: 'bar-rank-4', icon: '📱' },
+        { minCount: 720, maxCount: 850, minPct: 73, maxPct: 79, badgeClass: 'badge-rank-5', barClass: 'bar-rank-5', icon: '👤' }
+      ];
+
+      return selected.map((app, index) => {
+        const cfg = rankConfigs[index];
+        const count = Math.round(cfg.minCount + pseudoRandom() * (cfg.maxCount - cfg.minCount));
+        const pct = Math.round(cfg.minPct + pseudoRandom() * (cfg.maxPct - cfg.minPct));
+        const barHeightPct = Math.min(96, Math.max(48, Math.round((count / 1550) * 100)));
+        return {
+          ...app,
+          rank: index + 1,
+          count: count,
+          pct: pct,
+          barHeightPct: barHeightPct,
+          badgeClass: cfg.badgeClass,
+          barClass: cfg.barClass,
+          rankIcon: cfg.icon
+        };
+      });
+    }
+
+    function renderDailyTop5() {
+      const stageEl = document.getElementById('dailyTop5Stage');
+      const labelsEl = document.getElementById('dailyTop5Labels');
+      if (!stageEl || !labelsEl) return;
+
+      const isKhmer = (currentLanguage !== 'en');
+      const top5 = getDailyTop5Apps();
+
+      // Clear existing dynamic columns while preserving grid lines and axis
+      stageEl.querySelectorAll('.chart-column-item').forEach(el => el.remove());
+      labelsEl.innerHTML = '';
+
+      top5.forEach(item => {
+        const name = isKhmer ? item.nameKm : item.nameEn;
+        const countStr = formatDailyNumber(item.count, isKhmer);
+        const pctStr = (isKhmer ? toKhmerDigits(item.pct) : item.pct) + '%';
+        const actionLabel = item.isTool ? (isKhmer ? 'ប្រើ' : 'Use') : (isKhmer ? 'លេង' : 'Play');
+        const actionTitle = isKhmer ? `ចុចដើម្បី${item.isTool ? 'ប្រើប្រាស់' : 'ចូលលេង'} ${name}` : `Click to open ${name}`;
+
+        // 1. Column Bar Element
+        const colItem = document.createElement('div');
+        colItem.className = 'chart-column-item';
+        colItem.title = actionTitle;
+        colItem.onclick = () => { window.location.href = item.url; };
+        colItem.innerHTML = `
+          <div class="column-floating-badge ${item.badgeClass}">
+            <span class="badge-icon">${item.rankIcon}</span>
+            <span class="badge-num">${countStr}</span>
+          </div>
+          <div class="column-bar ${item.barClass}" style="height: ${item.barHeightPct}%;"></div>
+        `;
+        stageEl.appendChild(colItem);
+
+        // 2. Bottom Label Element
+        const labelItem = document.createElement('div');
+        labelItem.className = 'column-label-item';
+        labelItem.innerHTML = `
+          <span class="column-app-icon">${item.icon}</span>
+          <span class="column-app-name" title="${name}">${name}</span>
+          <span class="column-app-count">${pctStr}</span>
+          <a href="${item.url}" class="column-action-btn">
+            <i class="fa-solid fa-play mr-0.5"></i> <span>${actionLabel}</span>
+          </a>
+        `;
+        labelsEl.appendChild(labelItem);
+      });
+    }
+
+    // Toggle Sidebar In/Out
+    function toggleSidebar() {
+      if (window.innerWidth <= 768) {
+        document.getElementById('appSidebar').classList.toggle('open');
+      } else {
+        document.body.classList.toggle('sidebar-collapsed');
+        const isCollapsed = document.body.classList.contains('sidebar-collapsed');
+        localStorage.setItem('sidebar_collapsed', isCollapsed ? 'true' : 'false');
+      }
+    }
+
+    // Show Dashboard Function (Displays Dashboard View)
+    function showDashboard() {
+      const dashboardSection = document.getElementById('dashboardSection');
+      if (dashboardSection) {
+        dashboardSection.style.display = 'flex';
+      }
+
+      // Set sidebar active
+      document.querySelectorAll('.sidebar-menu .menu-item').forEach(item => item.classList.remove('active'));
+      const dashItem = document.getElementById('sidebar-menu-dashboard');
+      if (dashItem) dashItem.classList.add('active');
+
+      // Set filter buttons active
+      document.querySelectorAll('.cat-filter-btn').forEach(btn => btn.classList.remove('active'));
+      const dashBtn = document.querySelector('.cat-filter-btn[data-target="dashboard"]');
+      if (dashBtn) dashBtn.classList.add('active');
+
+      // Reset categories display
+      const categories = document.querySelectorAll('.category');
+      categories.forEach(cat => cat.style.display = 'block');
+
+      // Scroll smoothly to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      if (window.innerWidth <= 768) {
+        document.getElementById('appSidebar').classList.remove('open');
+      }
+    }
+
+    // Filter by Category (Optionally Hides Dashboard when viewing games list)
+    function filterCategory(categoryName, hideDashboard = true) {
+      const dashboardSection = document.getElementById('dashboardSection');
+
+      if (hideDashboard && dashboardSection) {
+        // HIDE DASHBOARD
+        dashboardSection.style.display = 'none';
+      }
+
+      const categories = document.querySelectorAll('.category');
+      const buttons = document.querySelectorAll('.cat-filter-btn');
+
+      buttons.forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.querySelector(`.cat-filter-btn[data-target="${categoryName}"]`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      categories.forEach(cat => {
+        if (categoryName === 'all' || cat.dataset.cat === categoryName) {
+          cat.style.display = 'block';
+        } else {
+          cat.style.display = 'none';
+        }
+      });
+
+      // Scroll to catalog section if dashboard was hidden
+      if (hideDashboard) {
+        const catalogEl = document.getElementById('catalog-section');
+        if (catalogEl) {
+          catalogEl.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    }
+
+    // Switch Sidebar Active Link
+    function switchSidebarTab(element) {
+      document.querySelectorAll('.sidebar-menu .menu-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      element.classList.add('active');
+      if (window.innerWidth <= 768) {
+        document.getElementById('appSidebar').classList.remove('open');
+      }
+    }
+
+    // Search Game/Tool Functionality with URL synchronization
+    function handleSearch(query, updateUrl = true) {
+      const rawQuery = query || '';
+      const q = rawQuery.trim().toLowerCase();
+      const gameCards = document.querySelectorAll('.game-card');
+      const categories = document.querySelectorAll('.category');
+      const clearBtn = document.getElementById('searchClearBtn');
+
+      // Toggle clear button
+      if (clearBtn) {
+        if (rawQuery.length > 0) {
+          clearBtn.classList.add('visible');
+        } else {
+          clearBtn.classList.remove('visible');
+        }
+      }
+
+      // Sync friendly search query in URL (?q=...)
+      if (updateUrl) {
+        try {
+          const currentUrl = new URL(window.location);
+          if (q.length > 0) {
+            currentUrl.searchParams.set('q', rawQuery.trim());
+          } else {
+            currentUrl.searchParams.delete('q');
+            currentUrl.searchParams.delete('search');
+          }
+          window.history.replaceState({}, '', currentUrl.toString());
+        } catch (err) {
+          // ignore in file:// protocol if restricted
+        }
+      }
+
+      if (q.length > 0) {
+        // Hide dashboard when user searches
+        const dashboardSection = document.getElementById('dashboardSection');
+        if (dashboardSection) dashboardSection.style.display = 'none';
+
+        document.querySelectorAll('.cat-filter-btn').forEach(btn => btn.classList.remove('active'));
+      }
+
+      gameCards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        if (text.includes(q)) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      categories.forEach(cat => {
+        const visibleCards = cat.querySelectorAll('.game-card[style="display: block;"], .game-card:not([style*="display: none"])');
+        if (visibleCards.length > 0) {
+          cat.style.display = 'block';
+        } else if (q.length > 0) {
+          cat.style.display = 'none';
+        }
+      });
+
+      if (q.length > 0) {
+        const catalogEl = document.getElementById('catalog-section');
+        if (catalogEl) {
+          catalogEl.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    }
+
+    // Clear search input & restore view
+    function clearSearch() {
+      const input = document.getElementById('globalSearchInput');
+      if (input) {
+        input.value = '';
+        input.focus();
+      }
+      handleSearch('', true);
+      showDashboard();
+    }
+
+    // Global Keyboard Shortcut for Search (Ctrl+K or /)
+    document.addEventListener('keydown', function (e) {
+      if ((e.ctrlKey && e.key.toLowerCase() === 'k') || (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA')) {
+        e.preventDefault();
+        const searchInput = document.getElementById('globalSearchInput');
+        if (searchInput) {
+          searchInput.focus();
+          searchInput.select();
+        }
+      }
+    });
+
+    // Setting Dropdown Handlers
+    function toggleSettingDropdown(e) {
+      if (e) e.stopPropagation();
+      const menu = document.getElementById('settingDropdownMenu');
+      const btn = document.getElementById('settingBtn');
+      if (menu) {
+        menu.classList.toggle('show');
+        if (btn) btn.classList.toggle('active');
+      }
+    }
+
+    function closeSettingDropdown() {
+      const menu = document.getElementById('settingDropdownMenu');
+      const btn = document.getElementById('settingBtn');
+      if (menu) menu.classList.remove('show');
+      if (btn) btn.classList.remove('active');
+    }
+
+    // Close setting dropdown when clicking anywhere outside
+    document.addEventListener('click', function (e) {
+      const wrapper = document.getElementById('settingDropdownWrapper');
+      if (wrapper && !wrapper.contains(e.target)) {
+        closeSettingDropdown();
+      }
+    });
+
+    // Modal Handlers
+    function openAboutModal() {
+      document.getElementById('aboutModal').classList.add('active');
+    }
+
+    function closeAboutModal() {
+      document.getElementById('aboutModal').classList.remove('active');
+    }
+
+    function openGiftModal() {
+      document.getElementById('giftModal').classList.add('active');
+    }
+
+    function closeGiftModal() {
+      document.getElementById('giftModal').classList.remove('active');
+    }
+
+    // Close modal when clicking background
+    document.getElementById('aboutModal').addEventListener('click', function (e) {
+      if (e.target === this) closeAboutModal();
+    });
+
+    document.getElementById('giftModal').addEventListener('click', function (e) {
+      if (e.target === this) closeGiftModal();
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        closeAboutModal();
+        closeGiftModal();
+      }
+    });
+
+    // Theme Toggle
+    function toggleTheme() {
+      const body = document.body;
+      const themeIcon = document.getElementById('themeIcon');
+
+      body.classList.toggle('dark-mode');
+
+      if (body.classList.contains('dark-mode')) {
+        themeIcon.classList.remove('fa-sun');
+        themeIcon.classList.add('fa-moon');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        themeIcon.classList.remove('fa-moon');
+        themeIcon.classList.add('fa-sun');
+        localStorage.setItem('theme', 'light');
+      }
+    }
+
+    // Font Weight Toggle (Bold <-> Regular)
+    function toggleFontWeight() {
+      const isRegular = document.body.classList.contains('font-regular');
+      const newWeight = isRegular ? 'bold' : 'regular';
+      applyFontWeight(newWeight);
+      localStorage.setItem('ck_font_weight', newWeight);
+    }
+
+    function applyFontWeight(weight) {
+      const navText = document.getElementById('fontWeightNavText');
+      const navIcon = document.getElementById('fontWeightNavIcon');
+      const dropdownIcon = document.getElementById('fontWeightDropdownIcon');
+      const dropdownText = document.getElementById('fontWeightDropdownText');
+
+      if (weight === 'regular') {
+        document.body.classList.add('font-regular');
+        if (navText) navText.textContent = currentLanguage === 'en' ? 'Regular' : 'ធម្មតា';
+        if (navIcon) {
+          navIcon.className = 'fa-solid fa-font';
+        }
+        if (dropdownIcon) {
+          dropdownIcon.className = 'fa-solid fa-font';
+        }
+        if (dropdownText) dropdownText.textContent = currentLanguage === 'en' ? 'Font: Regular' : 'កម្រាស់អក្សរ: ធម្មតា';
+      } else {
+        document.body.classList.remove('font-regular');
+        if (navText) navText.textContent = currentLanguage === 'en' ? 'Bold' : 'ដិត';
+        if (navIcon) {
+          navIcon.className = 'fa-solid fa-bold';
+        }
+        if (dropdownIcon) {
+          dropdownIcon.className = 'fa-solid fa-bold';
+        }
+        if (dropdownText) dropdownText.textContent = currentLanguage === 'en' ? 'Font: Bold' : 'កម្រាស់អក្សរ: ដិត';
+      }
+    }
+
+    // Set real-time date (Khmer or English)
+    function updateKhmerDate() {
+      const dateEl = document.getElementById('currentDateDisplay');
+      if (!dateEl) return;
+
+      const today = new Date();
+      if (currentLanguage === 'en') {
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        dateEl.textContent = today.toLocaleDateString('en-US', options);
+      } else {
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        dateEl.textContent = today.toLocaleDateString('km-KH', options);
+      }
+    }
+
+    // Page Load Setup
+    window.addEventListener('load', function () {
+      const savedTheme = localStorage.getItem('theme');
+      const themeIcon = document.getElementById('themeIcon');
+
+      if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        if (themeIcon) {
+          themeIcon.classList.remove('fa-sun');
+          themeIcon.classList.add('fa-moon');
+        }
+      }
+
+      const savedSidebar = localStorage.getItem('sidebar_collapsed');
+      if (savedSidebar === 'true' && window.innerWidth > 768) {
+        document.body.classList.add('sidebar-collapsed');
+      }
+
+      const savedLang = localStorage.getItem('site_lang') || 'km';
+      setLanguage(savedLang);
+
+      const savedFontWeight = localStorage.getItem('ck_font_weight') || 'bold';
+      applyFontWeight(savedFontWeight);
+
+      // Render daily top 5 trending programs
+      renderDailyTop5();
+
+      // Check friendly URL parameters on page load (?q=..., ?search=..., ?cat=...)
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchQuery = urlParams.get('q') || urlParams.get('search');
+        const catParam = urlParams.get('cat') || urlParams.get('category');
+
+        if (searchQuery) {
+          const searchInput = document.getElementById('globalSearchInput');
+          if (searchInput) {
+            searchInput.value = searchQuery;
+          }
+          handleSearch(searchQuery, false);
+        } else if (catParam) {
+          filterCategory(catParam, true);
+        }
+      } catch (e) { }
+    });
+  </script>
 </body>
+
 </html>
